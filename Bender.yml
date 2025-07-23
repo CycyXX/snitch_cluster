@@ -202,6 +202,20 @@ sources:
       - target/snitch_cluster/test/vip_snitch_cluster.sv
       - target/snitch_cluster/test/testharness.sv
 
+  # cdurrer: Konark
+  - target: konark
+    files:
+      - target/snitch_cluster/generated/snitch_cluster_pkg.sv
+  - target: all(konark, not(postlayout))
+    files:
+      - target/snitch_cluster/generated/snitch_cluster_wrapper.sv
+      - hw/snitch_cluster/src/konark_top.sv
+  - target: all(konark, any(simulation, verilator))
+    files:
+      - target/snitch_cluster/test/vip_snitch_cluster.sv
+      - target/snitch_cluster/test/testharness.sv
+
+  # physical implementation
   - target: gf12
     files:
       - nonfree/gf12/mems/tc_sram.sv
