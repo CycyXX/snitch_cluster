@@ -28,6 +28,8 @@ dependencies:
   riscv-dbg:          { git: https://github.com/pulp-platform/riscv-dbg,          version:  0.8.0       }
   cluster_icache:     { git: https://github.com/pulp-platform/cluster_icache.git, rev: 64e21ae455bbdde850c4df13bef86ea55ac42537 }
   idma:               { git: https://github.com/pulp-platform/iDMA.git,           rev: __deploy__bebefa3__master }
+  neureka:            { git: https://github.com/pulp-platform/neureka.git,        rev: main             }
+  datamover:          { git: https://github.com/pulp-platform/datamover.git,      rev: transpose        }
 
 export_include_dirs:
   - hw/reqrsp_interface/include

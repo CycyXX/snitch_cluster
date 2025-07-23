@@ -41,6 +41,13 @@ packages:
     - common_cells
     - scm
     - tech_cells_generic
+  cluster_interconnect:
+    revision: 1284def6c0b7f7e9355eb093d00883ad9dead1b7
+    version: null
+    source:
+      Git: https://github.com/pulp-platform/cluster_interconnect.git
+    dependencies:
+    - common_cells
   common_cells:
     revision: bef3d3c5ed0e2cc211e69a6dbd81c4fe3a97025c
     version: null
@@ -55,6 +62,15 @@ packages:
     source:
       Git: https://github.com/pulp-platform/common_verification.git
     dependencies: []
+  datamover:
+    revision: fb7d09c201ab52de23b11adf12b36d8e75c4c0e6
+    version: null
+    source:
+      Git: https://github.com/pulp-platform/datamover.git
+    dependencies:
+    - hci
+    - hwpe-ctrl
+    - hwpe-stream
   fpnew:
     revision: a8e0cba6dd50f357ece73c2c955d96efc3c6c315
     version: null
@@ -70,6 +86,29 @@ packages:
       Git: https://github.com/pulp-platform/fpu_div_sqrt_mvp.git
     dependencies:
     - common_cells
+  hci:
+    revision: 7c11cc0e3f18329daabba38b5588e05e53b0497e
+    version: null
+    source:
+      Git: https://github.com/pulp-platform/hci.git
+    dependencies:
+    - cluster_interconnect
+    - hwpe-stream
+    - l2_tcdm_hybrid_interco
+  hwpe-ctrl:
+    revision: a5966201aeeb988d607accdc55da933a53c6a56e
+    version: null
+    source:
+      Git: https://github.com/pulp-platform/hwpe-ctrl.git
+    dependencies:
+    - tech_cells_generic
+  hwpe-stream:
+    revision: c1e25094bf9f2fee754611ef7491b7a1144e11b9
+    version: 1.9.1
+    source:
+      Git: https://github.com/pulp-platform/hwpe-stream.git
+    dependencies:
+    - tech_cells_generic
   idma:
     revision: 7829f71691a62c1e2e5e3230f370f222c7a83087
     version: null
@@ -82,6 +121,22 @@ packages:
     - common_verification
     - obi
     - register_interface
+  l2_tcdm_hybrid_interco:
+    revision: fa55e72859dcfb117a2788a77352193bef94ff2b
+    version: 1.0.0
+    source:
+      Git: https://github.com/pulp-platform/L2_tcdm_hybrid_interco.git
+    dependencies: []
+  neureka:
+    revision: ff7090eb3738a5192af0f4e1499e4ed44a3041e5
+    version: null
+    source:
+      Git: https://github.com/pulp-platform/neureka.git
+    dependencies:
+    - hci
+    - hwpe-ctrl
+    - hwpe-stream
+    - zeroriscy
   obi:
     revision: 0155fc34e900c7c884e081c0a1114a247937ff69
     version: 0.1.7
@@ -122,3 +177,9 @@ packages:
       Git: https://github.com/pulp-platform/tech_cells_generic
     dependencies:
     - common_verification
+  zeroriscy:
+    revision: cc4068a0ccb7691cd062b809c34b2304e7fbfa36
+    version: null
+    source:
+      Git: https://github.com/yvantor/ibex.git
+    dependencies: []
