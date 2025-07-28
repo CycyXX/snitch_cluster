@@ -1,3 +1,5 @@
+// Author: Cyrill Durrer <cdurrer@iis.ee.ethz.ch>
+
 #include "snrt.h"
 #include "data.h"
 

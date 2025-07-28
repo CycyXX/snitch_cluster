@@ -8,39 +8,37 @@
 `include "axi/typedef.svh"
 `include "tcdm_interface/typedef.svh"
 
-module konark_top
-  import floo_pkg::*;
-  import floo_picobello_noc_pkg::*;
-  import snitch_cluster_pkg::*;
-  import picobello_pkg::*;
-(
-  input  logic                                    clk_i,
-  input  logic                                    rst_ni,
-  input  logic                                    test_enable_i,
-  // input  logic                                    tile_clk_en_i,
-  // input  logic                                    tile_rst_ni,
-  // input  logic                                    clk_rst_bypass_i,
-  // Cluster ports
-  input  logic                      [NrCores-1:0] debug_req_i,
-  input  logic                      [NrCores-1:0] meip_i,
-  input  logic                      [NrCores-1:0] mtip_i,
-  input  logic                      [NrCores-1:0] msip_i,
-  input  logic                      [        9:0] hart_base_id_i,
-  input  snitch_cluster_pkg::addr_t               cluster_base_addr_i,
-  // Chimney ports
-  // input  id_t                                     id_i,
-  // Router ports
-  // output floo_req_t                 [ West:North] floo_req_o,
-  // input  floo_rsp_t                 [ West:North] floo_rsp_i,
-  // output floo_wide_t                [ West:North] floo_wide_o,
-  // input  floo_req_t                 [ West:North] floo_req_i,
-  // output floo_rsp_t                 [ West:North] floo_rsp_o,
-  // input  floo_wide_t                [ West:North] floo_wide_i
-);
 
-  // Tile-specific reset and clock signals
-  // logic                                 tile_clk;
-  // logic                                 tile_rst_n;
+module konark_top
+  // import floo_pkg::*;
+  // import floo_picobello_noc_pkg::*;
+  import snitch_cluster_pkg::*;
+  // import picobello_pkg::*;
+(
+  input  logic                                   clk_i,
+  input  logic                                   rst_ni,
+  input  logic [snitch_cluster_pkg::NrCores-1:0] debug_req_i,
+  input  logic [snitch_cluster_pkg::NrCores-1:0] meip_i,
+  input  logic [snitch_cluster_pkg::NrCores-1:0] mtip_i,
+  input  logic [snitch_cluster_pkg::NrCores-1:0] msip_i,
+  input  logic [snitch_cluster_pkg::NrCores-1:0] mxip_i,
+  input  logic [9:0]                             hart_base_id_i,
+  input  logic [47:0]                            cluster_base_addr_i,
+  input  logic                                   clk_d2_bypass_i,         // unused
+  input  snitch_cluster_pkg::sram_cfgs_t         sram_cfgs_i,             // unused
+  input  snitch_cluster_pkg::narrow_in_req_t     narrow_in_req_i,
+  output snitch_cluster_pkg::narrow_in_resp_t    narrow_in_resp_o,
+  output snitch_cluster_pkg::narrow_out_req_t    narrow_out_req_o,
+  input  snitch_cluster_pkg::narrow_out_resp_t   narrow_out_resp_i,
+  output snitch_cluster_pkg::wide_out_req_t      wide_out_req_o,
+  input  snitch_cluster_pkg::wide_out_resp_t     wide_out_resp_i,
+  input  snitch_cluster_pkg::wide_in_req_t       wide_in_req_i,
+  output snitch_cluster_pkg::wide_in_resp_t      wide_in_resp_o
+  // output snitch_cluster_pkg::narrow_out_req_t    narrow_ext_req_o,
+  // input  snitch_cluster_pkg::narrow_out_resp_t   narrow_ext_resp_i,
+  // input  snitch_cluster_pkg::tcdm_dma_req_t [1-1:0] tcdm_ext_req_i,
+  // output snitch_cluster_pkg::tcdm_dma_rsp_t [1-1:0] tcdm_ext_resp_o
+);
 
   ////////////////////
   // Snitch Cluster //
@@ -83,8 +81,8 @@ module konark_top
   logic          [NrCores-1:0] mxip;
 
   snitch_cluster_wrapper i_cluster (
-    .clk_i            (tile_clk),
-    .rst_ni           (tile_rst_n),
+    .clk_i,
+    .rst_ni,
     .debug_req_i,
     .meip_i,
     .mtip_i,
@@ -94,14 +92,14 @@ module konark_top
     .mxip_i           (mxip),
     .clk_d2_bypass_i  ('0),
     .sram_cfgs_i      ('0),
-    .narrow_in_req_i  (cluster_narrow_in_req),
-    .narrow_in_resp_o (cluster_narrow_in_rsp),
-    .narrow_out_req_o (cluster_narrow_out_req),
-    .narrow_out_resp_i(cluster_narrow_out_rsp),
-    .wide_out_req_o   (cluster_wide_out_req),
-    .wide_out_resp_i  (cluster_wide_out_rsp),
-    .wide_in_req_i    (cluster_wide_in_req),
-    .wide_in_resp_o   (cluster_wide_in_rsp),
+    .narrow_in_req_i,
+    .narrow_in_resp_o,
+    .narrow_out_req_o,
+    .narrow_out_resp_i,
+    .wide_out_req_o,
+    .wide_out_resp_i,
+    .wide_in_req_i,
+    .wide_in_resp_o,
     .narrow_ext_req_o (cluster_narrow_ext_req),
     .narrow_ext_resp_i(cluster_narrow_ext_rsp),
     .tcdm_ext_req_i   (cluster_tcdm_ext_req_aligned),

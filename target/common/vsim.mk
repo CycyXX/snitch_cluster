@@ -57,7 +57,8 @@ VSIM_FLAGS += -do "run -a"
 endif
 
 # Misc
-VSIM_TOP_MODULE = tb_bin
+# VSIM_TOP_MODULE = tb_bin
+VSIM_TOP_MODULE = tb_bin_konark
 VSIM_RTL_PREREQ_FILE = $(VSIM_BUILDDIR)/$(VSIM_TOP_MODULE).d
 
 #########
