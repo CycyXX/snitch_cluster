@@ -15,7 +15,10 @@ module snitch_hwpe_subsystem
   parameter type         periph_rsp_t  = logic,
   parameter int unsigned HwpeDataWidth = 256,
   parameter int unsigned IdWidth       = 8,
-  parameter int unsigned NrCores       = 1024,
+  parameter int unsigned NrCores       = 1,    // corresponds to Snitch cluster
+  parameter int unsigned NrContext     = 2,
+  parameter int unsigned PE_H          = 6,    // 6x6 PE array = 36 PEs with 32 MACUs each: 1152 MACUs
+  parameter int unsigned PE_W          = 6,
   parameter int unsigned TCDMDataWidth = 64
 ) (
   input logic clk_i,
@@ -215,8 +218,8 @@ module snitch_hwpe_subsystem
     .DW           (),
     .N_CORES      (NrCores),
     .N_CONTEXT    (NrContext),
-    .PE_H         (),
-    .PE_W         (),
+    .PE_H         (PE_H),
+    .PE_W         (PE_W),
     .HCI_SIZE_tcdm(HCISizeTcdm)
   ) i_neureka_top (
     .clk_i      (hwpe_clk[0]),

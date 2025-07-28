@@ -190,7 +190,10 @@ module konark_top
     .periph_rsp_t (hwpectrl_rsp_t),
     .HwpeDataWidth(snitch_cluster_pkg::WideDataWidth),
     .IdWidth      (snitch_cluster_pkg::NarrowIdWidthOut),
-    .NrCores      (NrCores),
+    .NrCores      (1),
+    .NrContext    (2),
+    .PE_H         (6),
+    .PE_W         (6),
     .TCDMDataWidth(snitch_cluster_pkg::NarrowDataWidth)
   ) i_snitch_hwpe_subsystem (
     .clk_i          (clk_i),
