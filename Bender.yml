@@ -28,6 +28,7 @@ dependencies:
   riscv-dbg:          { git: https://github.com/pulp-platform/riscv-dbg,          version:  0.8.0       }
   cluster_icache:     { git: https://github.com/pulp-platform/cluster_icache.git, rev: 64e21ae455bbdde850c4df13bef86ea55ac42537 }
   idma:               { git: https://github.com/pulp-platform/iDMA.git,           rev: __deploy__bebefa3__master }
+  hci:                { git: https://github.com/pulp-platform/hci.git,            rev: "06fcba671e060f2e1b03b7ebe2d3e719f1557099" }
   neureka:            { git: https://github.com/pulp-platform/neureka.git,        rev: main             }
   datamover:          { git: https://github.com/pulp-platform/datamover.git,      rev: transpose        }
 
@@ -163,11 +164,13 @@ sources:
       - hw/snitch_cluster/src/snitch_sequencer.sv
       - hw/snitch_cluster/src/snitch_tcdm_fc_interconnect.sv
       - target/snitch_cluster/test/snitch_bootrom.sv
+      - hw/snitch_cluster/src/snitch_hwpe_subsystem.sv
       # Level 1
       - hw/snitch_cluster/src/snitch_barrier.sv
       - hw/snitch_cluster/src/snitch_fp_ss.sv
       - hw/snitch_cluster/src/snitch_shared_muldiv.sv
       - hw/snitch_cluster/src/snitch_tcdm_interconnect.sv
+      - hw/snitch_cluster/src/snitch_tcdm_aligner.sv
       # Level 2
       - hw/snitch_cluster/src/snitch_cc.sv
       - hw/snitch_cluster/src/snitch_clkdiv2.sv
@@ -189,19 +192,19 @@ sources:
       - target/common/test/tb_bin_konark.sv
 
   # target/snitch_cluster
-  - target: snitch_cluster_wrapper
-    files:
-      - target/snitch_cluster/generated/snitch_cluster_pkg.sv
-  - target: all(snitch_cluster_wrapper, not(postlayout))
-    files:
-      - target/snitch_cluster/generated/snitch_cluster_wrapper.sv
-  - target: all(snitch_cluster_wrapper, postlayout)
-    files:
-      - nonfree/gf12/fusion/runs/0/out/15/snitch_cluster_wrapper.v
-  - target: all(snitch_cluster_wrapper, any(simulation, verilator))
-    files:
-      - target/snitch_cluster/test/vip_snitch_cluster.sv
-      - target/snitch_cluster/test/testharness.sv
+  # - target: snitch_cluster_wrapper
+  #   files:
+  #     - target/snitch_cluster/generated/snitch_cluster_pkg.sv
+  # - target: all(snitch_cluster_wrapper, not(postlayout))
+  #   files:
+  #     - target/snitch_cluster/generated/snitch_cluster_wrapper.sv
+  # - target: all(snitch_cluster_wrapper, postlayout)
+  #   files:
+  #     - nonfree/gf12/fusion/runs/0/out/15/snitch_cluster_wrapper.v
+  # - target: all(snitch_cluster_wrapper, any(simulation, verilator))
+  #   files:
+  #     - target/snitch_cluster/test/vip_snitch_cluster.sv
+  #     - target/snitch_cluster/test/testharness.sv
 
   # cdurrer: Konark
   - target: konark
