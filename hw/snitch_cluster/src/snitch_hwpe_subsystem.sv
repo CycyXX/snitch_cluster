@@ -231,21 +231,6 @@ module snitch_hwpe_subsystem
     .periph     (periph[0])
   );
 
-  // redmule_top #(
-  //   .ID_WIDTH     (IdWidth),
-  //   .N_CORES      (NrCores),
-  //   .DW           (HwpeDataWidth),
-  //   .HCI_SIZE_tcdm(HCISizeTcdm)
-  // ) i_redmule_top (
-  //   .clk_i      (hwpe_clk[0]),
-  //   .rst_ni     (rst_ni),
-  //   .test_mode_i(test_mode_i),
-  //   .evt_o      (evt[0]),
-  //   .busy_o     (busy),
-  //   .tcdm       (tcdm_to_mux[0]),
-  //   .periph     (periph[0])
-  // );
-
   datamover_top #(
     .ID           (IdWidth),
     .N_CORES      (NrCores),
