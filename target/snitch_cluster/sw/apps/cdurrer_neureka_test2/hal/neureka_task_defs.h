@@ -21,6 +21,10 @@
 #ifndef __NEUREKA_DEFS_H__
 #define __NEUREKA_DEFS_H__
 
+/* BSP */
+
+#define NNX_NEUREKA_TESTBENCH 1
+
 /* ARCHITECTURE */
 
 #define NNX_NEUREKA_PE_H (4)

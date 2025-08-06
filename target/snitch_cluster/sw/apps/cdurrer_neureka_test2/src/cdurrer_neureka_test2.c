@@ -20,26 +20,59 @@
  *           Renzo Andri <andrire@iis.ee.ethz.ch>
  *           Arpan Suravi Prasad <prasadar@iis.ee.ethz.ch>
  *           Luka Macan <luka.macan@unibo.it>
- * Main Test Program for N-EUREKA
+ *
+ * Adapted for Snitch cluster (Konark): Cyrill Durrer <cdurrer@iis.ee.ethz.ch>
  */
 
-#include <stdint.h>
-#include <stdio.h>
+#include "snrt.h"
+
+#include "printf.h"
+
+// #include <stdint.h>
+// #include <stdio.h>
 
 #include "layer_util.h"
 #include "nnx_layer.h"
+
+#include "bias.h"
+#include "input.h"
+#include "layer_conf.h"
+#include "scale.h"
+#include "weight.h"
 #include "output.h"
 
+void dma_copy_to_tcdm(int32_t *local_bias) {
+  if (snrt_is_dm_core()) {
+    printf("<DMA> Copying data to TCDM...\n");
+    size_t size = sizeof(int32_t) * BIAS_SIZE;
+    snrt_dma_start_1d(local_bias, bias, size);
+    snrt_dma_wait_all();
+  }
+}
+
 int main() {
+  int32_t *local_bias;
 
-  // execute NNX layer
-  printf("Executing NNX layer...\n");
-  execute_nnx_layer(NULL);
+  local_bias = (int32_t *)snrt_l1_next();
+  dma_copy_to_tcdm(local_bias);
 
-  // output checking
-  int err = check_output();
+  if (snrt_is_dm_core()) {
+    printf("<DMA> local_bias [0x%p]: %d\n", local_bias, local_bias[0]);
+  }
 
-  *(volatile int *) (0x80000000) = err;
-  *(volatile int *) (0x80000004) = 1;
+  // wait for DMA transfer to finish
+  snrt_cluster_hw_barrier();
+
+  if(snrt_is_compute_core()) {
+    // execute NNX layer
+    printf("<COMPUTE> Executing NNX layer...\n");
+    execute_nnx_layer(NULL);
+
+    // output checking
+    int err = check_output();
+
+    *(volatile int *) (0x80000000) = err;
+    *(volatile int *) (0x80000004) = 1;
+  }
   return 0;
 }

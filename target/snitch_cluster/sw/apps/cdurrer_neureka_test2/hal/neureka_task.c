@@ -209,11 +209,11 @@ void neureka_task_set_counters(neureka_task_t *task, const uint32_t k_in,
       (task->kernel_shape == 1 ? rem_Wo : rem_Wo + 2) - padding_right;
 
   const neureka_subtile_t subtile = {
-      .number = {.KoKi = nnx_concat_half(num_Ko, num_Ki),
-                 .HoWo = nnx_concat_half(num_Ho, num_Wo)},
       .remainder = {.KoKi = nnx_concat_half(rem_Ko, rem_Ki),
-                    .HoWo = nnx_concat_half(rem_Ho, rem_Wo),
-                    .HiWi = nnx_concat_half(rem_Hi, rem_Wi)}};
+                .HoWo = nnx_concat_half(rem_Ho, rem_Wo),
+                .HiWi = nnx_concat_half(rem_Hi, rem_Wi)},
+      .number = {.KoKi = nnx_concat_half(num_Ko, num_Ki),
+                 .HoWo = nnx_concat_half(num_Ho, num_Wo)}};
   task->data.cfg.subtile = subtile;
 }
 

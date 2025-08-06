@@ -27,6 +27,9 @@
 #include "neureka_task.h"
 #include "pulp_nnx_neureka.h"
 
+#ifdef NULL
+#undef NULL
+#endif
 #define NULL 0
 
 typedef neureka_norm_mode_e nnx_norm_mode_e;

@@ -27,31 +27,31 @@
 #include <sys/types.h>
 
 void neureka_nnx_init(neureka_dev_t *dev, neureka_bsp_conf_t *conf) {
-  printf("Initializing N-EUREKA...\n");
+  printf("Initializing Neureka...\n");
   neureka_bsp_open(conf);
   hwpe_soft_clear(&dev->hwpe_dev);
 }
 
 void neureka_nnx_term(neureka_dev_t *dev) {
-  printf("Terminating N-EUREKA...\n");
+  printf("Terminating Neureka...\n");
   hwpe_soft_clear(&dev->hwpe_dev);
   neureka_bsp_close();
 }
 
 int neureka_nnx_dispatch_check(neureka_dev_t *dev) {
-  printf("Checking if N-EUREKA is ready for dispatch...\n");
+  printf("Checking if Neureka is ready for dispatch...\n");
   return !neureka_task_queue_full(dev);
 }
 
 void neureka_nnx_dispatch_wait(neureka_dev_t *dev) {
-  printf("Waiting for N-EUREKA to be ready for dispatch...\n");
+  printf("Waiting for Neureka to be ready for dispatch...\n");
   while (!neureka_nnx_dispatch_check(dev)) {
     neureka_bsp_event_wait_and_clear();
   }
 }
 
 int neureka_nnx_dispatch(neureka_dev_t *dev, neureka_task_t *task) {
-  printf("Dispatching N-EUREKA task with ID: %d...\n", task->id);
+  printf("Dispatching Neureka task with ID: %d...\n", task->id);
   if (hwpe_task_queue_acquire_task(&dev->hwpe_dev, &task->id)) {
     return 1;
   }
@@ -62,7 +62,7 @@ int neureka_nnx_dispatch(neureka_dev_t *dev, neureka_task_t *task) {
 }
 
 int neureka_nnx_resolve_check(neureka_dev_t *dev, neureka_task_t *task) {
-  printf("Checking if N-EUREKA task with ID: %d is resolved...\n", task->id);
+  printf("Checking if Neureka task with ID: %d is resolved...\n", task->id);
 
 #if __PLATFORM__ == ARCHI_PLATFORM_GVSOC
   // GVSOC model has a broken running_id so resolve_check
@@ -77,7 +77,7 @@ int neureka_nnx_resolve_check(neureka_dev_t *dev, neureka_task_t *task) {
 }
 
 void neureka_nnx_resolve_wait(neureka_dev_t *dev, neureka_task_t *task) {
-  printf("Waiting for N-EUREKA task with ID: %d to resolve...\n", task->id);
+  printf("Waiting for Neureka task with ID: %d to resolve...\n", task->id);
   while (!neureka_nnx_resolve_check(dev, task)) {
     neureka_bsp_event_wait_and_clear();
   }

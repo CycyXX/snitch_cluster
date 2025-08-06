@@ -42,10 +42,10 @@ void neureka_testbench_event_wait_and_clear() {
   asm volatile ("wfi" ::: "memory");
 }
 
-static const neureka_dev_t neureka_testbench_dev = {
+static neureka_dev_t neureka_testbench_dev = {
     .hwpe_dev = (struct hwpe_dev_t){
         .base_addr = (volatile uint32_t *)NEUREKA_TESTBENCH_BASE_ADDR}};
 
-const neureka_dev_t *neureka_testbench_get_dev() {
+neureka_dev_t *neureka_testbench_get_dev() {
   return &neureka_testbench_dev;
 }

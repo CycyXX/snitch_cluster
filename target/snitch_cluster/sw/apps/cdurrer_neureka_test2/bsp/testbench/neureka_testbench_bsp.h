@@ -31,6 +31,6 @@ typedef struct neureka_testbench_conf_t {
 void neureka_testbench_open(neureka_testbench_conf_t *conf);
 void neureka_testbench_close();
 void neureka_testbench_event_wait_and_clear();
-const neureka_dev_t *neureka_testbench_get_dev();
+neureka_dev_t *neureka_testbench_get_dev();
 
 #endif // !__NEUREKA_TESTBENCH_BSP_H__

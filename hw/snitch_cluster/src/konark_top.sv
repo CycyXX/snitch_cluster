@@ -190,7 +190,7 @@ module konark_top
     .periph_rsp_t (hwpectrl_rsp_t),
     .HwpeDataWidth(snitch_cluster_pkg::WideDataWidth),
     .IdWidth      (snitch_cluster_pkg::NarrowIdWidthOut),
-    .NrCores      (1),
+    .NrCores      (2), // ToDo(cdurrer): count DMA core?
     .NrContext    (2),
     .PE_H         (6),
     .PE_W         (6),
