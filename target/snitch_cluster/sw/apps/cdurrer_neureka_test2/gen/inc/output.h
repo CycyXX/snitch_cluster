@@ -9,6 +9,6 @@ extern uint8_t output[OUTPUT_SIZE];
 #define GOLDEN_OUTPUT_SIZE (512)
 extern uint8_t golden_output[GOLDEN_OUTPUT_SIZE];
 
-int check_output();
+int check_output(uint8_t *output);
 
 #endif  // __OUTPUT_H__

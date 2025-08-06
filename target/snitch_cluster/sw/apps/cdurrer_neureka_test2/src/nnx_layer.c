@@ -19,7 +19,10 @@
  */
 
 #include "nnx_layer.h"
+#include "layer_util.h"
 #include <pmsis.h>
+
+#include "snrt.h"
 
 #include "neureka.h"
 #include "neureka_gvsoc.h"
@@ -64,12 +67,26 @@ typedef neureka_task_flag_e nnx_task_flag_e;
 #define nnx_term neureka_nnx_term
 
 // Generated headers
+#include "layer_conf.h"
 #include "bias.h"
 #include "input.h"
-#include "layer_conf.h"
 #include "output.h"
 #include "scale.h"
 #include "weight.h"
+
+static int32_t *local_bias;
+static uint8_t *local_input;
+static uint8_t *local_scale;
+static uint8_t *local_weight;
+static uint8_t *local_output;
+
+static void dma_copy_to_tcdm(void *dest_addr, void *src_addr, size_t size) {
+  if (snrt_is_dm_core()) {
+    printf("<DMA> Copying data to TCDM...\n");
+    snrt_dma_start_1d(dest_addr, src_addr, size);
+    snrt_dma_wait_all();
+  }
+}
 
 static void task_prepare(nnx_task_t *task) {
   nnx_task_init(task);
@@ -117,9 +134,11 @@ static void task_prepare(nnx_task_t *task) {
                     PADDING_RIGHT);
 #endif
 
-  nnx_task_set_ptrs_conv(task, (uint32_t)input, INPUT_WIDTH, w_in_stride,
-                         PADDING_TOP, PADDING_LEFT, (uint32_t)output,
-                         (uint32_t)weight);
+  nnx_task_set_ptrs_conv(task, (uint32_t)local_input, INPUT_WIDTH, w_in_stride,
+                         PADDING_TOP, PADDING_LEFT, (uint32_t)local_output,
+                         (uint32_t)local_weight);
+printf("task_prepare(): task->data.outfeat_ptr = 0x%x\n", task->data.outfeat_ptr);
+
 #if HAS_NORM_QUANT == 1
 #if SCALE_BITS == 8
   const nnx_norm_mode_e normMode = normMode8Bit;
@@ -129,7 +148,7 @@ static void task_prepare(nnx_task_t *task) {
 
   const nnx_task_flag_e flag_bias =
       HAS_BIAS ? nnxTaskFlagTrue : nnxTaskFlagFalse;
-  const uint32_t bias_ptr = (uint32_t)(HAS_BIAS ? bias : NULL);
+  const uint32_t bias_ptr = (uint32_t)(HAS_BIAS ? local_bias : NULL);
 
   nnx_quant_function_e quant_function =
       HAS_RELU ? quantFunctionRelu : quantFunctionIdentity;
@@ -142,7 +161,7 @@ static void task_prepare(nnx_task_t *task) {
                                        .flag_bias = flag_bias,
                                        .flag_shift = nnxTaskFlagFalse});
 
-  nnx_task_set_ptrs_norm_quant(task, (uint32_t)scale, NULL, bias_ptr);
+  nnx_task_set_ptrs_norm_quant(task, (uint32_t)local_scale, NULL, bias_ptr);
 #endif // HAS_NORM_QUANT
 }
 
@@ -174,6 +193,49 @@ static void task_execute(nnx_task_t *task) {
 
 void execute_nnx_layer(void *args) {
   nnx_task_t task;
-  task_prepare(&task);
-  task_execute(&task);
+
+  local_bias = (int32_t *)snrt_l1_next();
+  local_input = (uint8_t *)(local_bias + BIAS_SIZE);
+  local_scale = (uint8_t *)(local_input + INPUT_SIZE);
+  local_weight = (uint8_t *)(local_scale + SCALE_SIZE);
+  local_output = (uint8_t *)(local_weight + WEIGHT_SIZE);
+
+  dma_copy_to_tcdm(local_bias, &bias, sizeof(int32_t) * BIAS_SIZE);
+  dma_copy_to_tcdm(local_input, &input, sizeof(uint8_t) * INPUT_SIZE);
+  dma_copy_to_tcdm(local_scale, &scale, sizeof(uint8_t) * SCALE_SIZE);
+  dma_copy_to_tcdm(local_weight, &weight, sizeof(uint8_t) * WEIGHT_SIZE);
+  dma_copy_to_tcdm(local_output, &output, sizeof(uint8_t) * OUTPUT_SIZE);   // ToDo(cdurrer): copying 0s necessary for space allocation?
+
+  if (snrt_is_dm_core()) {
+    printf("<DMA> local_bias   [0x%p]: 0x%x (signed dec: %d)\n", local_bias, local_bias[0], local_bias[0]);
+    printf("<DMA> local_input  [0x%p]: 0x%x\n", local_input, local_input[0]);
+    printf("<DMA> local_scale  [0x%p]: 0x%x\n", local_scale, local_scale[0]);
+    printf("<DMA> local_weight [0x%p]: 0x%x\n", local_weight, local_weight[0]);
+    printf("<DMA> local_output [0x%p]: 0x%x\n", local_output, local_output[0]);
+  }
+
+  // wait for DMA transfer to finish
+  snrt_cluster_hw_barrier();
+
+  if(snrt_is_compute_core()) {
+    printf("<COMPUTE> local_bias   [0x%p]: 0x%x (signed dec: %d)\n", local_bias, local_bias[0], local_bias[0]);
+    printf("<COMPUTE> local_input  [0x%p]: 0x%x\n", local_input, local_input[0]);
+    printf("<COMPUTE> local_scale  [0x%p]: 0x%x\n", local_scale, local_scale[0]);
+    printf("<COMPUTE> local_weight [0x%p]: 0x%x\n", local_weight, local_weight[0]);
+    printf("<COMPUTE> local_output [0x%p]: 0x%x\n", local_output, local_output[0]);
+    // execute NNX layer
+    printf("<COMPUTE> Executing NNX layer...\n");
+    layer_info();
+    task_prepare(&task);
+    task_execute(&task);
+
+    printf("<COMPUTE> after computation: local_output [0x%p]: 0x%x\n", local_output, local_output[0]);
+
+      // output checking
+    int err = check_output(local_output);   // ToDo(cdurrer): fix/rewrite
+
+    // ToDo(cdurrer): what is this?
+    *(volatile int *) (0x80000000) = err;
+    *(volatile int *) (0x80000004) = 1;
+  }
 }

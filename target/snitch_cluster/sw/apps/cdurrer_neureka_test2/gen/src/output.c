@@ -1,7 +1,7 @@
 #include "output.h"
 
 #define OUTPUT_SIZE (512)
-PI_L1 uint8_t output[OUTPUT_SIZE];
+uint8_t output[OUTPUT_SIZE];
 
 #define GOLDEN_OUTPUT_SIZE (512)
 PI_L2 uint8_t golden_output[GOLDEN_OUTPUT_SIZE] = {
@@ -59,7 +59,7 @@ PI_L2 uint8_t golden_output[GOLDEN_OUTPUT_SIZE] = {
     0x07, 0x00
 };
 
-int check_output() {
+int check_output(uint8_t *output) {
         printf("Checking the output vector:\n");
 
         int n_err = 0;

@@ -22,6 +22,8 @@
 #include "neureka_task_defs.h"
 #include "pulp_nnx_util.h"
 
+#include <printf.h>
+
 uint32_t neureka_get_tile_padding(uint32_t padding, uint32_t i_height,
                                   uint32_t i_width, uint32_t n_height,
                                   uint32_t n_width) {
@@ -136,6 +138,10 @@ void neureka_task_set_ptrs_conv(neureka_task_t *task, uint32_t input_ptr,
                                 uint32_t w_in, uint32_t w_in_stride,
                                 uint8_t padding_top, uint8_t padding_left,
                                 uint32_t output_ptr, uint32_t weights_ptr) {
+  printf("neureka_task_set_ptrs_conv(): input_ptr=0x%p, w_in=%d, w_in_stride=%d, "
+         "padding_top=%d, padding_left=%d, output_ptr=0x%p, weights_ptr=0x%p\n",
+         input_ptr, w_in, w_in_stride, padding_top, padding_left, output_ptr,
+         weights_ptr);
   task->data.infeat_ptr =
       neureka_pad_ptr(input_ptr, w_in, w_in_stride, padding_top, padding_left);
   task->data.outfeat_ptr = output_ptr;
