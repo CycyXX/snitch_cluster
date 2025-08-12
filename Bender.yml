@@ -30,7 +30,7 @@ dependencies:
   idma:               { git: https://github.com/pulp-platform/iDMA.git,           rev: __deploy__bebefa3__master }
   hci:                { git: https://github.com/pulp-platform/hci.git,            rev: "06fcba671e060f2e1b03b7ebe2d3e719f1557099" }
   neureka:            { git: https://github.com/pulp-platform/neureka.git,        rev: main             }
-  datamover:          { git: https://github.com/pulp-platform/datamover.git,      rev: transpose        }
+  # datamover:          { git: https://github.com/pulp-platform/datamover.git,      rev: transpose        }
 
 export_include_dirs:
   - hw/reqrsp_interface/include

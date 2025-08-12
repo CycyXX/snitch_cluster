@@ -231,19 +231,19 @@ module snitch_hwpe_subsystem
     .periph     (periph[0])
   );
 
-  datamover_top #(
-    .ID           (IdWidth),
-    .N_CORES      (NrCores),
-    .BW           (HwpeDataWidth),
-    .HCI_SIZE_tcdm(HCISizeTcdm)
-  ) i_datamover_top (
-    .clk_i      (hwpe_clk[1]),
-    .rst_ni     (rst_ni),
-    .test_mode_i(test_mode_i),
-    .evt_o      (evt[1]),
-    .tcdm       (tcdm_to_mux[1]),
-    .periph     (periph[1])
-  );
+  // datamover_top #(
+  //   .ID           (IdWidth),
+  //   .N_CORES      (NrCores),
+  //   .BW           (HwpeDataWidth),
+  //   .HCI_SIZE_tcdm(HCISizeTcdm)
+  // ) i_datamover_top (
+  //   .clk_i      (hwpe_clk[1]),
+  //   .rst_ni     (rst_ni),
+  //   .test_mode_i(test_mode_i),
+  //   .evt_o      (evt[1]),
+  //   .tcdm       (tcdm_to_mux[1]),
+  //   .periph     (periph[1])
+  // );
 
   hci_core_mux_static #(
     .NB_CHAN    (2),

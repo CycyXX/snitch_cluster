@@ -5,19 +5,19 @@
 {
     cluster: {
         cluster_base_addr: 0x10000000,
-        cluster_base_offset: 0,
-        cluster_base_hartid: 0,
+        cluster_base_offset: 0x0,
+        cluster_base_hartid: 1,
         addr_width: 48,
         data_width: 64,
-        atomic_id_width: 5, // clog2(total number of clusters)
-        user_width: 53, // addr_width + atomic_id_width
+        atomic_id_width: 2, // clog2(total number of clusters)
+        user_width: 50, // addr_width + atomic_id_width
         tcdm: {
             size: 128,
             banks: 32,
         },
         cluster_periph_size: 60, // kB
         zero_mem_size: 64, // kB
-        alias_region_enable: true,
+        ext_mem_size: 4, //kB
         dma_data_width: 512,
         dma_axi_req_fifo_depth: 24,
         dma_req_fifo_depth: 8,
@@ -25,8 +25,13 @@
         wide_trans: 32,
         dma_user_width: 48,
         enable_multicast: true,
-        // We don't need Snitch debugging in Occamy
-        enable_debug: false,
+        cluster_base_expose: true,
+        alias_region_enable: true,      // ToDo(cdurrer): is this necessary?
+        alias_region_base: 0x30000000,
+        wide_tcdm_port_expose: true,
+        num_exposed_wide_tcdm_ports: 1, // ToDo(cdurrer): why not declared in Picobello cluster?
+        narrow_axi_port_expose: true,
+        enable_external_interrupts: true,
         // We don't need Snitch (core-internal) virtual memory support
         vm_support: false,
         // Memory configuration inputs
@@ -65,7 +70,7 @@
                 icache: {
                     size: 8, // total instruction cache size in kByte
                     ways: 2, // number of ways
-                    cacheline: 512 // word size in bits
+                    cacheline: 256 // word size in bits
                 },
                 cores: [
                     { $ref: "#/compute_core_template" },

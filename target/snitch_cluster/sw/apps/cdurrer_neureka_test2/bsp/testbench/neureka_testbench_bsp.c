@@ -22,24 +22,30 @@
 #include "neureka_testbench_bsp.h"
 #include <pmsis.h>
 
-#define NEUREKA_TESTBENCH_CLUSTER_CTRL_BASE_ADDR (0x00100000)
-#define NEUREKA_TESTBENCH_BASE_ADDR (0x00100000)
-// fixme
-// #define NEUREKA_TESTBENCH_WEIGHT_MEM_BASE_ADDR (0x10400000)
-// #define NEUREKA_TESTBENCH_WEIGHT_MEM_MRAM_OFFSET (0x00000000)
-// #define NEUREKA_TESTBENCH_WEIGHT_MEM_SRAM_OFFSET (0x00400000)
+// #define NEUREKA_TESTBENCH_CLUSTER_CTRL_BASE_ADDR (0x10040000)   // ToDo(cdurrer): not used anywhere?
+#define NEUREKA_TESTBENCH_BASE_ADDR (0x10040000)
+
+
+void neureka_testbench_hci_setpriority_neureka() {
+}
+
+void neureka_testbench_hci_setpriority_core() {
+}
+
+void neureka_testbench_hci_reset_max_stall() {
+}
+
+void neureka_testbench_hci_set_max_stall(uint32_t max_stall) {
+}
 
 void neureka_testbench_open(neureka_testbench_conf_t *conf) {
   printf("Opening Neureka Testbench BSP...\n");
-  return;
 }
 
 void neureka_testbench_close() {
-  return;
 }
 
 void neureka_testbench_event_wait_and_clear() {
-  asm volatile ("wfi" ::: "memory");
 }
 
 static neureka_dev_t neureka_testbench_dev = {

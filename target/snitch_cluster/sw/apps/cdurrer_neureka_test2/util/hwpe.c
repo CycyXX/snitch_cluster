@@ -20,6 +20,7 @@
 
 #include "hwpe.h"
 #include <stdint.h>
+#include <printf.h>
 
 #define HWPE_TRIGGER 0
 #define HWPE_ACQUIRE 1
@@ -30,7 +31,10 @@
 #define HWPE_SWSYNC 6
 #define HWPE_TASK_REG_OFFSET 8
 
+#define HWPE_ACTIVATE_CLK 0x9C/4
+
 inline void hwpe_reg_write(hwpe_dev_t *dev, int reg, uint32_t value) {
+  printf("hwpe_reg_write(): dev->base_addr = 0x%p, reg = %d, value = 0x%x\n", dev->base_addr, reg, value);
   dev->base_addr[reg] = value;
 }
 
@@ -46,10 +50,16 @@ inline uint32_t hwpe_task_reg_read(hwpe_dev_t *dev, int reg) {
   return hwpe_reg_read(dev, HWPE_TASK_REG_OFFSET + reg);
 }
 
+void hwpe_activate_clk(hwpe_dev_t *dev) {
+  printf("hwpe_activate_clk(): Activating CLK...\n");
+  hwpe_reg_write(dev, HWPE_ACTIVATE_CLK, 1);                 // ToDo(cdurrer): rework?
+}
+
 void hwpe_soft_clear(hwpe_dev_t *dev) {
+  printf("hwpe_soft_clear(): Clearing HWPE...\n");
   hwpe_reg_write(dev, HWPE_SOFT_CLEAR, 0);
-  for (volatile int i = 0; i < 10; i++)
-    ;
+  // for (volatile int i = 0; i < 10; i++)
+  //   ;
 }
 
 uint32_t hwpe_task_queue_status(hwpe_dev_t *dev) {

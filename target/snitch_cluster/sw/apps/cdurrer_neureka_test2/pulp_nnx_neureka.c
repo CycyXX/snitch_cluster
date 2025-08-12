@@ -29,7 +29,10 @@
 void neureka_nnx_init(neureka_dev_t *dev, neureka_bsp_conf_t *conf) {
   printf("Initializing Neureka...\n");
   neureka_bsp_open(conf);
+  printf("Neureka BSP opened with max stall: %d\n", conf->max_stall);
+  hwpe_activate_clk(&dev->hwpe_dev);
   hwpe_soft_clear(&dev->hwpe_dev);
+  printf("Neureka initialized with base address: 0x%p\n", dev->hwpe_dev.base_addr);
 }
 
 void neureka_nnx_term(neureka_dev_t *dev) {
