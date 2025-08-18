@@ -137,7 +137,7 @@ static void task_prepare(nnx_task_t *task) {
   nnx_task_set_ptrs_conv(task, (uint32_t)local_input, INPUT_WIDTH, w_in_stride,
                          PADDING_TOP, PADDING_LEFT, (uint32_t)local_output,
                          (uint32_t)local_weight);
-printf("task_prepare(): task->data.outfeat_ptr = 0x%x\n", task->data.outfeat_ptr);
+  printf("task_prepare(): task->data.outfeat_ptr = 0x%x\n", task->data.outfeat_ptr);
 
 #if HAS_NORM_QUANT == 1
 #if SCALE_BITS == 8

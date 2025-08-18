@@ -8,13 +8,14 @@ module snitch_hwpe_subsystem
   import hci_package::*;
   import hwpe_ctrl_package::*;
   import reqrsp_pkg::amo_op_e;
+  import neureka_package::*;
 #(
   parameter type         tcdm_req_t    = logic,
   parameter type         tcdm_rsp_t    = logic,
   parameter type         periph_req_t  = logic,
   parameter type         periph_rsp_t  = logic,
-  parameter int unsigned HwpeDataWidth = 256,
-  parameter int unsigned IdWidth       = 8,
+  parameter int unsigned HwpeDataWidth = 288, //256,
+  parameter int unsigned IdWidth       = 0, //8,
   parameter int unsigned NrCores       = 2,    // corresponds to Snitch cluster (ToDo: count DMA cores?)
   parameter int unsigned NrContext     = 2,
   parameter int unsigned PE_H          = 6,    // 6x6 PE array = 36 PEs with 32 MACUs each: 1152 MACUs
@@ -38,13 +39,17 @@ module snitch_hwpe_subsystem
 
   localparam int unsigned NrTCDMPorts = (HwpeDataWidth / TCDMDataWidth);
 
+  localparam int unsigned TP_IN  = NEUREKA_TP_IN;
+  localparam int unsigned TP_OUT = NEUREKA_TP_OUT;
+  localparam VLEN_CNT_SIZE = 32;
+
   // verilog_format: off
   localparam hci_size_parameter_t HCISizeTcdm = '{
     DW:  HwpeDataWidth,
     AW:  DEFAULT_AW,
     BW:  DEFAULT_BW,
-    UW:  DEFAULT_UW,
-    IW:  DEFAULT_IW,
+    UW:  0, //DEFAULT_UW,
+    IW:  0, //DEFAULT_IW,
     EW:  0,
     EHW: 0
   };
@@ -210,12 +215,12 @@ module snitch_hwpe_subsystem
   );
 
   neureka_top #(
-    .TP_IN        (),
-    .TP_OUT       (),
-    .CNT          (),
+    .TP_IN        (TP_IN),
+    .TP_OUT       (TP_OUT),
+    .CNT          (VLEN_CNT_SIZE),
     .ID           (IdWidth),
     .BW           (HwpeDataWidth),
-    .DW           (),
+    .DW           (HCISizeTcdm.DW),
     .N_CORES      (NrCores),
     .N_CONTEXT    (NrContext),
     .PE_H         (PE_H),

@@ -32,6 +32,7 @@ void hwpe_reg_write(hwpe_dev_t *dev, int reg, uint32_t value);
 uint32_t hwpe_reg_read(hwpe_dev_t *dev, int reg);
 void hwpe_task_reg_write(hwpe_dev_t *dev, int reg, uint32_t value);
 uint32_t hwpe_task_reg_read(hwpe_dev_t *dev, int reg);
+void hwpe_activate_clk(hwpe_dev_t *dev);
 void hwpe_soft_clear(hwpe_dev_t *dev);
 uint32_t hwpe_task_queue_status(hwpe_dev_t *dev);
 int hwpe_task_queue_acquire_task(hwpe_dev_t *dev, uint8_t *id);
