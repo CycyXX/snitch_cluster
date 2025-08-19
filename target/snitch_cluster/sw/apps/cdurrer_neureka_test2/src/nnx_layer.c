@@ -137,7 +137,7 @@ static void task_prepare(nnx_task_t *task) {
   nnx_task_set_ptrs_conv(task, (uint32_t)local_input, INPUT_WIDTH, w_in_stride,
                          PADDING_TOP, PADDING_LEFT, (uint32_t)local_output,
                          (uint32_t)local_weight);
-  printf("task_prepare(): task->data.outfeat_ptr = 0x%x\n", task->data.outfeat_ptr);
+  // printf("task_prepare(): task->data.outfeat_ptr = 0x%x\n", task->data.outfeat_ptr);
 
 #if HAS_NORM_QUANT == 1
 #if SCALE_BITS == 8
@@ -167,17 +167,17 @@ static void task_prepare(nnx_task_t *task) {
 
 static void task_execute(nnx_task_t *task) {
   nnx_dev_t *dev = nnx_bsp_get_dev();
-  printf("task_execute(): dev->hwpe_dev.base_addr = 0x%p\n", dev->hwpe_dev.base_addr);
+  // printf("task_execute(): dev->hwpe_dev.base_addr = 0x%p\n", dev->hwpe_dev.base_addr);
 
   nnx_bsp_conf_t conf = {.max_stall = 8};
   nnx_init(dev, &conf);
 
   nnx_dispatch_wait(dev);
 
-  printf("CFG:\n");
-  for (int i=0; i<sizeof(neureka_task_data_t)/4; i++) {
-    printf("%08x\n", ((uint32_t *) &task->data)[i]);
-  }
+  // printf("CFG:\n");
+  // for (int i=0; i<sizeof(neureka_task_data_t)/4; i++) {
+  //   printf("%08x\n", ((uint32_t *) &task->data)[i]);
+  // }
 #if STRIDE_HEIGHT == 2 && STRIDE_WIDTH == 2
   nnx_dispatch_stride2x2(dev, task, INPUT_WIDTH, INPUT_CHANNEL, OUTPUT_HEIGHT,
                          OUTPUT_WIDTH, OUTPUT_CHANNEL, WEIGHT_HEIGHT,
@@ -230,7 +230,7 @@ void execute_nnx_layer(void *args) {
     task_prepare(&task);
     task_execute(&task);
 
-    printf("<COMPUTE> after computation: local_output [0x%p]: 0x%x\n", local_output, local_output[0]);
+    // printf("<COMPUTE> after computation: local_output [0x%p]: 0x%x\n", local_output, local_output[0]);
 
       // output checking
     int err = check_output(local_output);   // ToDo(cdurrer): fix/rewrite

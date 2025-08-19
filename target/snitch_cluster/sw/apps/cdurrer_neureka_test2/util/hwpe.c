@@ -34,7 +34,7 @@
 #define HWPE_ACTIVATE_CLK 0x9C/4            // ToDo(cdurrer): add general definition of additional ctrl addresses
 
 inline void hwpe_reg_write(hwpe_dev_t *dev, int reg, uint32_t value) {
-  printf("hwpe_reg_write(): dev->base_addr = 0x%p, reg = %d, value = 0x%x\n", dev->base_addr, reg, value);
+  // printf("hwpe_reg_write(): dev->base_addr = 0x%p, reg = %d, value = 0x%x\n", dev->base_addr, reg, value);
   dev->base_addr[reg] = value;
 }
 
