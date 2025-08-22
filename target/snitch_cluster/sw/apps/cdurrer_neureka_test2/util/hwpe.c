@@ -52,7 +52,7 @@ inline uint32_t hwpe_task_reg_read(hwpe_dev_t *dev, int reg) {
 
 void hwpe_activate_clk(hwpe_dev_t *dev) {
   printf("hwpe_activate_clk(): Activating CLK...\n");
-  hwpe_reg_write(dev, HWPE_ACTIVATE_CLK, 1);                 // ToDo(cdurrer): rework?
+  hwpe_reg_write(dev, HWPE_ACTIVATE_CLK, 3);    // 1 to enable Neureka, 2 to enable Datamover, 3 to enable both
 }
 
 void hwpe_soft_clear(hwpe_dev_t *dev) {

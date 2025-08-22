@@ -188,8 +188,8 @@ module konark_top
     .tcdm_rsp_t   (snitch_cluster_pkg::tcdm_dma_rsp_t),
     .periph_req_t (hwpectrl_req_t),
     .periph_rsp_t (hwpectrl_rsp_t),
-    .HwpeDataWidth(288), //(snitch_cluster_pkg::WideDataWidth),
-    .IdWidth      (snitch_cluster_pkg::NarrowIdWidthOut),
+    .HwpeDataWidth(288), //(snitch_cluster_pkg::WideDataWidth), // ToDo(cdurrer): leave hardcoded?
+    .IdWidth      (1), //(snitch_cluster_pkg::NarrowIdWidthOut), //ToDo(cdurrer): check
     .NrCores      (2), // ToDo(cdurrer): count DMA core?
     .NrContext    (2),
     .PE_H         (6),

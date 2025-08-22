@@ -15,8 +15,8 @@ module snitch_hwpe_subsystem
   parameter type         periph_req_t  = logic,
   parameter type         periph_rsp_t  = logic,
   parameter int unsigned HwpeDataWidth = 288, //256,
-  parameter int unsigned IdWidth       = 0, //8,
-  parameter int unsigned NrCores       = 2,    // corresponds to Snitch cluster (ToDo: count DMA cores?)
+  parameter int unsigned IdWidth       = 2, //8,
+  parameter int unsigned NrCores       = 2,    // corresponds to Snitch cluster (ToDo(cdurrer): count DMA cores?)
   parameter int unsigned NrContext     = 2,
   parameter int unsigned PE_H          = 6,    // 6x6 PE array = 36 PEs with 32 MACUs each: 1152 MACUs
   parameter int unsigned PE_W          = 6,
@@ -49,7 +49,7 @@ module snitch_hwpe_subsystem
     AW:  DEFAULT_AW,
     BW:  DEFAULT_BW,
     UW:  0, //DEFAULT_UW,
-    IW:  0, //DEFAULT_IW,
+    IW:  1, //DEFAULT_IW,
     EW:  0,
     EHW: 0
   };
@@ -73,6 +73,8 @@ module snitch_hwpe_subsystem
     .WAIVE_RSP3_ASSERT(1'b1),
 `endif
     .DW               (HwpeDataWidth),
+    .UW               (0),
+    .IW               (IdWidth),
     .EW               (0),
     .EHW              (0)
   ) tcdm (
@@ -84,6 +86,8 @@ module snitch_hwpe_subsystem
     .WAIVE_RSP3_ASSERT(1'b1),
 `endif
     .DW               (HwpeDataWidth),
+    .UW               (0),
+    .IW               (1),
     .EW               (0),
     .EHW              (0)
   ) tcdm_to_mux[0:1] (
@@ -236,19 +240,19 @@ module snitch_hwpe_subsystem
     .periph     (periph[0])
   );
 
-  // datamover_top #(
-  //   .ID           (IdWidth),
-  //   .N_CORES      (NrCores),
-  //   .BW           (HwpeDataWidth),
-  //   .HCI_SIZE_tcdm(HCISizeTcdm)
-  // ) i_datamover_top (
-  //   .clk_i      (hwpe_clk[1]),
-  //   .rst_ni     (rst_ni),
-  //   .test_mode_i(test_mode_i),
-  //   .evt_o      (evt[1]),
-  //   .tcdm       (tcdm_to_mux[1]),
-  //   .periph     (periph[1])
-  // );
+  datamover_top #(
+    .ID           (IdWidth),
+    .N_CORES      (NrCores),
+    .BW           (HwpeDataWidth),
+    .HCI_SIZE_tcdm(HCISizeTcdm)
+  ) i_datamover_top (
+    .clk_i      (hwpe_clk[1]),
+    .rst_ni     (rst_ni),
+    .test_mode_i(test_mode_i),
+    .evt_o      (evt[1]),
+    .tcdm       (tcdm_to_mux[1]),
+    .periph     (periph[1])
+  );
 
   hci_core_mux_static #(
     .NB_CHAN    (2),
