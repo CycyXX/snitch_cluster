@@ -9,8 +9,8 @@
         cluster_base_hartid: 1,
         addr_width: 48,
         data_width: 64,
-        atomic_id_width: 0, // clog2(total number of clusters)
-        user_width: 50, // addr_width + atomic_id_width
+        atomic_id_width: 0,     // clog2(total number of clusters)
+        user_width: 50,         // addr_width + atomic_id_width
         tcdm: {
             size: 128,
             banks: 32,

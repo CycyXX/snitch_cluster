@@ -14,8 +14,8 @@ module snitch_hwpe_subsystem
   parameter type         tcdm_rsp_t    = logic,
   parameter type         periph_req_t  = logic,
   parameter type         periph_rsp_t  = logic,
-  parameter int unsigned HwpeDataWidth = 288, //256,
-  parameter int unsigned IdWidth       = 2, //8,
+  parameter int unsigned HwpeDataWidth = 288,
+  parameter int unsigned IdWidth       = 2,
   parameter int unsigned NrCores       = 2,    // corresponds to Snitch cluster (ToDo(cdurrer): count DMA cores?)
   parameter int unsigned NrContext     = 2,
   parameter int unsigned PE_H          = 6,    // 6x6 PE array = 36 PEs with 32 MACUs each: 1152 MACUs
