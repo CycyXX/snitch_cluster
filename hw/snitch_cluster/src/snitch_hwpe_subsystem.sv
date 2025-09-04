@@ -145,10 +145,23 @@ module snitch_hwpe_subsystem
     periph[1].data          = hwpe_ctrl_req_i.q.data;
     periph[1].id            = hwpe_ctrl_req_i.q.user;
 
-    if ((hwpe_ctrl_req_i.q.addr[7:0] == CLK_EN_OFFS || hwpe_ctrl_req_i.q.addr[7:0] == MUX_SEL_OFFS ||
+    if ((hwpe_ctrl_req_i.q.addr[7:0] == CLK_EN_OFFS ||
+         hwpe_ctrl_req_i.q.addr[7:0] == MUX_SEL_OFFS ||
          hwpe_ctrl_req_i.q.addr[7:0] == EVT_CLR_OFFS)) begin
+      // Special CSRs are handled locally in the subsystem.
       hwpe_ctrl_rsp_o.q_ready = hwpe_ctrl_req_i.q_valid;
       hwpe_ctrl_rsp_o.p_valid = '1;
+`ifndef SYNTHESIS
+      // Provide simple readback for debug/bring-up when performing reads.
+      if (!hwpe_ctrl_req_i.q.write) begin
+        unique case (hwpe_ctrl_req_i.q.addr[7:0])
+          CLK_EN_OFFS:  hwpe_ctrl_rsp_o.p.data = {30'b0, clk_en};
+          MUX_SEL_OFFS: hwpe_ctrl_rsp_o.p.data = {31'b0, mux_sel};
+          EVT_CLR_OFFS: hwpe_ctrl_rsp_o.p.data = { {(32-NrCores){1'b0}}, hwpe_evt_q };
+          default:      hwpe_ctrl_rsp_o.p.data = '0;
+        endcase
+      end
+`endif
     end else begin
       // request channel
       if (periph_sel_d == 1'b0) begin
@@ -192,7 +205,6 @@ module snitch_hwpe_subsystem
     end
   end
 
-
   for (genvar ii = 0; ii < NrCores; ii++) begin : gen_hwpe_evt
     always_ff @(posedge clk_i or negedge rst_ni) begin
       if (~rst_ni) begin
@@ -210,18 +222,15 @@ module snitch_hwpe_subsystem
   end
   assign hwpe_evt_o = hwpe_evt_q;
 
+  /////////////
+  // NEUREKA //
+  /////////////
+
   tc_clk_gating i_neureka_clk_gate (
     .clk_i    (clk_i),
     .en_i     (clk_en[0]),
     .test_en_i('0),
     .clk_o    (hwpe_clk[0])
-  );
-
-  tc_clk_gating i_datamover_clk_gate (
-    .clk_i    (clk_i),
-    .en_i     (clk_en[1]),
-    .test_en_i('0),
-    .clk_o    (hwpe_clk[1])
   );
 
   neureka_top #(
@@ -244,6 +253,17 @@ module snitch_hwpe_subsystem
     .busy_o     (busy),
     .tcdm       (tcdm_to_mux[0]),
     .periph     (periph[0])
+  );
+
+
+  ///////////////
+  // DATAMOVER //
+  ///////////////
+  tc_clk_gating i_datamover_clk_gate (
+    .clk_i    (clk_i),
+    .en_i     (clk_en[1]),
+    .test_en_i('0),
+    .clk_o    (hwpe_clk[1])
   );
 
   datamover_top #(
@@ -272,4 +292,11 @@ module snitch_hwpe_subsystem
     .out    (tcdm)
   );
 
+  // Sanity Checks
+  property no_both_clks_simultaneously;
+    @(posedge clk_i) disable iff(~rst_ni)
+      !(mux_sel == 1'b1 && clk_en[1] && clk_en[0]);
+  endproperty
+  assert property(no_both_clks_simultaneously)
+    else $error("[HWPE] Both clocks enabled not supported: clk_en=%b", clk_en);
 endmodule : snitch_hwpe_subsystem
