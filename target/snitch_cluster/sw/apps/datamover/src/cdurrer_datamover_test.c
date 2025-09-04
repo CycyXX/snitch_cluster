@@ -28,6 +28,8 @@
 #include "stdio.h"
 #include <stdint.h>
 #include "hal_datamover.h"
+#include "snitch_hwpe_subsystem_addrmap.h"
+#include "konark_addrmap.h"
 #include "lfsr32.h"
 #include "data.h"
 
@@ -71,18 +73,71 @@ int main()
   snrt_cluster_hw_barrier();
 
   if (snrt_cluster_core_idx() == 0) {
-    // enable clock
-    *(volatile uint32_t *)0x1004009C = 3;
-    DATAMOVER_CG_ENABLE();
+    // Enable clock only for Datamover (gate Neureka): clk_en = 2'b10
+    volatile uint32_t *hwpe_clk_en = (uint32_t *)(KONARK_HWPE_SUBSYS_BASE_ADDR + SNITCH_HWPE_SUBSYSTEM_CLK_EN_REG_OFFSET);
+    *hwpe_clk_en = 2; // bit0=Neureka, bit1=Datamover
+    printf("[HWPE] clk_en set to 0x%x (expect 0x2)\n", *hwpe_clk_en);
+    // Route HCI periph port to Datamover
+    volatile uint32_t *hwpe_mux_sel = (uint32_t *)(KONARK_HWPE_SUBSYS_BASE_ADDR + SNITCH_HWPE_SUBSYSTEM_MUX_SEL_REG_OFFSET);
+    *hwpe_mux_sel = 1; // 0=Neureka, 1=Datamover
+    printf("[HWPE] mux_sel set to 0x%x (1=Datamover)\n", *hwpe_mux_sel);
 
-    // setup HCI
-    DATAMOVER_SETPRIORITY_DATAMOVER(); // priority to DATAMOVER w.r.t. cores, DMA
-    DATAMOVER_RESET_MAXSTALL();   // reset maximum stall
-    DATAMOVER_SET_MAXSTALL(8);    // set maximum consecutive stall to 8 cycles for cores, DMA side
+    // Soft-clear Datamover and acquire a job
+    DATAMOVER_WRITE_CMD(DATAMOVER_SOFT_CLEAR, DATAMOVER_SOFT_CLEAR_ALL);
+    for (volatile int kk = 0; kk < 10; kk++) ;
 
+    int job_id = -1;
+    do {
+      DATAMOVER_READ_CMD(job_id, DATAMOVER_ACQUIRE);
+    } while (job_id < 0);
+
+    // Program a flat 1D move (copy DATA_SIZE bytes from local_x to local_y)
+    DATAMOVER_WRITE_REG(DATAMOVER_REG_IN_PTR,  (uint32_t)(uintptr_t)local_x);
+    DATAMOVER_WRITE_REG(DATAMOVER_REG_OUT_PTR, (uint32_t)(uintptr_t)local_y);
+    DATAMOVER_WRITE_REG(DATAMOVER_REG_TOT_LEN,       DATA_SIZE / DATAMOVER_BW);
+    DATAMOVER_WRITE_REG(DATAMOVER_REG_IN_D0_LEN,     DATA_SIZE / DATAMOVER_BW);
+    DATAMOVER_WRITE_REG(DATAMOVER_REG_IN_D0_STRIDE,  DATAMOVER_BW);
+    DATAMOVER_WRITE_REG(DATAMOVER_REG_IN_D1_LEN,     1);
+    DATAMOVER_WRITE_REG(DATAMOVER_REG_IN_D1_STRIDE,  0);
+    DATAMOVER_WRITE_REG(DATAMOVER_REG_IN_D2_STRIDE,  0);
+    DATAMOVER_WRITE_REG(DATAMOVER_REG_OUT_D0_LEN,    DATA_SIZE / DATAMOVER_BW);
+    DATAMOVER_WRITE_REG(DATAMOVER_REG_OUT_D0_STRIDE, DATAMOVER_BW);
+    DATAMOVER_WRITE_REG(DATAMOVER_REG_OUT_D1_LEN,    1);
+    DATAMOVER_WRITE_REG(DATAMOVER_REG_OUT_D1_STRIDE, 0);
+    DATAMOVER_WRITE_REG(DATAMOVER_REG_OUT_D2_STRIDE, 0);
+
+    // Commit and trigger
+    DATAMOVER_WRITE_CMD(DATAMOVER_COMMIT_AND_TRIGGER, DATAMOVER_TRIGGER_CMD);
+
+    // Busy-wait for completion (poll STATUS)
+    int status = 0;
+    do {
+      DATAMOVER_READ_CMD(status, DATAMOVER_STATUS);
+    } while (status != 0);
   }
 
-  return 0;
+  snrt_cluster_hw_barrier();
+
+  // Verify: local_y must match local_x (DATA_SIZE bytes)
+  if (snrt_cluster_core_idx() == 0) {
+    int mismatches = 0;
+    for (int i = 0; i < DATA_SIZE; ++i) {
+      if (local_y[i] != local_x[i]) {
+        if (mismatches < 8) {
+          printf("Mismatch @ %d: exp=0x%02x got=0x%02x\n", i, local_x[i], local_y[i]);
+        }
+        mismatches++;
+      }
+    }
+    if (mismatches == 0) {
+      printf("> Datamover copy OK (%d bytes).\n", DATA_SIZE);
+    } else {
+      printf("> Datamover copy FAILED: %d mismatches.\n", mismatches);
+      errors += mismatches;
+    }
+  }
+
+  return errors;
 //   return pmsis_kickoff((void *)test_kickoff);
 }
 
