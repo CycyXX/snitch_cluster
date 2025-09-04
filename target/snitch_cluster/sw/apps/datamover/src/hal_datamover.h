@@ -10,7 +10,6 @@
 #include "archi_datamover.h"
 
 #define DATAMOVER_ADDR_BASE DATAMOVER_BASE_ADD
-#define DATAMOVER_ADDR_SPACE 0x00000100
 
 #define DATAMOVER_WRITE(value, offset) *(volatile int *)(DATAMOVER_ADDR_BASE + offset) = value
 #define DATAMOVER_READ(offset) *(volatile int *)(DATAMOVER_ADDR_BASE + offset)
@@ -64,6 +63,7 @@ static inline void datamover_trigger_job() { DATAMOVER_WRITE(0, DATAMOVER_TRIGGE
 static inline int datamover_acquire_job() { return DATAMOVER_READ(DATAMOVER_ACQUIRE); }
 
 static inline unsigned int datamover_get_status() { return DATAMOVER_READ(DATAMOVER_STATUS); }
+static inline unsigned int datamover_get_running_job() { return DATAMOVER_READ(DATAMOVER_RUNNING_JOB); }
 
 static inline void datamover_soft_clear() {
   volatile int i;

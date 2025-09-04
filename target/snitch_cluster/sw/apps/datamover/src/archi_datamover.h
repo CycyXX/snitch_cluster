@@ -11,9 +11,10 @@
 #define DATAMOVER_ARCHI_CL_EVT_ACC1 1
 
 // Base address
-#include "konark_addrmap.h"
-// Datamover mapped inside HWPE subsystem window
-#define DATAMOVER_BASE_ADD (KONARK_HWPE_SUBSYS_BASE_ADDR)
+#include <stdint.h>
+#include "snitch_cluster_addrmap.h"
+// Map Datamover control into the cluster-visible narrow address space:
+#define DATAMOVER_BASE_ADD ((uintptr_t)(&snitch_cluster_addrmap.cluster.zeromem) + sizeof(snitch_cluster__zeromem_t) + 0x100)
 
 // Commands
 #define DATAMOVER_TRIGGER 0x00
