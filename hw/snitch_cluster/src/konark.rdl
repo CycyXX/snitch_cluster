@@ -1,0 +1,28 @@
+// Copyright 2025 ETH Zurich and University of Bologna.
+// Solderpad Hardware License, Version 0.51, see LICENSE for details.
+// SPDX-License-Identifier: SHL-0.51
+
+`ifndef __KONARK_RDL__
+`define __KONARK_RDL__
+
+// Top-level Konark address map.
+// Instantiates the Snitch cluster address map and the HWPE subsystem CSRs
+// at fixed base addresses to keep HW and SW in sync.
+
+`include "snitch_cluster.rdl"
+`include "hwpe_subsystem/snitch_hwpe_subsystem.rdl"
+
+addrmap konark {
+  // Use 64-bit register width as a safe default for top-level.
+  default regwidth = 64;
+
+  // Snitch cluster at 0x0000_0000
+  external snitch_cluster snitch_cluster @ 64'h0000_0000;
+
+  // HWPE subsystem (Konark) CSRs at 0x1004_0000 (as used by testbench BSP)
+  // Note: This block uses 32-bit registers internally.
+  snitch_hwpe_subsystem hwpe_subsys @ 64'h1004_0000;
+};
+
+`endif // __KONARK_RDL__
+

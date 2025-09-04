@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: SHL-0.51
 
 `include "hci_helpers.svh"
+`include "snitch_hwpe_subsystem_addrmap.svh"
 
 module snitch_hwpe_subsystem
   import hci_package::*;
@@ -119,6 +120,11 @@ module snitch_hwpe_subsystem
     end
   end
 
+  // Offsets for subsystem CSRs (fallback to literals if header not present)
+  localparam logic [7:0] EVT_CLR_OFFS = 8'(`SNITCH_HWPE_SUBSYSTEM_EVT_CLR_REG_OFFSET);
+  localparam logic [7:0] MUX_SEL_OFFS = 8'(`SNITCH_HWPE_SUBSYSTEM_MUX_SEL_REG_OFFSET);
+  localparam logic [7:0] CLK_EN_OFFS  = 8'(`SNITCH_HWPE_SUBSYSTEM_CLK_EN_REG_OFFSET);
+
   always_comb begin
     // defaults overridden below
     periph[0].req           = '0;
@@ -139,8 +145,8 @@ module snitch_hwpe_subsystem
     periph[1].data          = hwpe_ctrl_req_i.q.data;
     periph[1].id            = hwpe_ctrl_req_i.q.user;
 
-    if ((hwpe_ctrl_req_i.q.addr[7:0] == 'h9C || hwpe_ctrl_req_i.q.addr[7:0] == 'h98 ||
-         hwpe_ctrl_req_i.q.addr[7:0] == 'h94)) begin
+    if ((hwpe_ctrl_req_i.q.addr[7:0] == CLK_EN_OFFS || hwpe_ctrl_req_i.q.addr[7:0] == MUX_SEL_OFFS ||
+         hwpe_ctrl_req_i.q.addr[7:0] == EVT_CLR_OFFS)) begin
       hwpe_ctrl_rsp_o.q_ready = hwpe_ctrl_req_i.q_valid;
       hwpe_ctrl_rsp_o.p_valid = '1;
     end else begin
@@ -168,7 +174,7 @@ module snitch_hwpe_subsystem
     if (~rst_ni) begin
       clk_en <= '0;
     end else begin
-      if (hwpe_ctrl_req_i.q.addr[7:0] == 'h9C && hwpe_ctrl_req_i.q_valid &&
+      if (hwpe_ctrl_req_i.q.addr[7:0] == CLK_EN_OFFS && hwpe_ctrl_req_i.q_valid &&
           hwpe_ctrl_req_i.q.write) begin
         clk_en <= hwpe_ctrl_req_i.q.data[1:0];
       end
@@ -179,7 +185,7 @@ module snitch_hwpe_subsystem
     if (~rst_ni) begin
       mux_sel <= '0;
     end else begin
-      if (hwpe_ctrl_req_i.q.addr[7:0] == 'h98 && hwpe_ctrl_req_i.q_valid &&
+      if (hwpe_ctrl_req_i.q.addr[7:0] == MUX_SEL_OFFS && hwpe_ctrl_req_i.q_valid &&
           hwpe_ctrl_req_i.q.write) begin
         mux_sel <= hwpe_ctrl_req_i.q.data[0];
       end
@@ -195,7 +201,7 @@ module snitch_hwpe_subsystem
         if (evt[mux_sel][ii]) begin
           hwpe_evt_q[ii] <= 1'b1;
         end
-        else if (hwpe_ctrl_req_i.q.addr[7:0] == 'h94 && hwpe_ctrl_req_i.q_valid &&
+        else if (hwpe_ctrl_req_i.q.addr[7:0] == EVT_CLR_OFFS && hwpe_ctrl_req_i.q_valid &&
                  hwpe_ctrl_req_i.q.write && hwpe_ctrl_req_i.q.data == (1 << ii)) begin
           hwpe_evt_q[ii] <= 1'b0;
         end

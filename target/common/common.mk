@@ -13,6 +13,7 @@ TB_DIR       ?= $(SN_ROOT)/target/common/test
 UTIL_DIR     ?= $(SN_ROOT)/util
 LOGS_DIR      = $(SIM_DIR)/logs
 SN_PERIPH_DIR = $(SN_ROOT)/hw/snitch_cluster/src/snitch_cluster_peripheral
+SN_HWPE_DIR   = $(SN_ROOT)/hw/snitch_cluster/src/hwpe_subsystem
 SN_TARGET_DIR = $(SN_ROOT)/target/snitch_cluster
 SN_GEN_DIR   ?= $(SN_TARGET_DIR)/generated
 SN_HW_DIR     = $(SN_ROOT)/hw
