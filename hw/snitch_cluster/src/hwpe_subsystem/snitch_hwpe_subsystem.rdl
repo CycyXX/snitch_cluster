@@ -1,0 +1,40 @@
+// Copyright 2025 ETH Zurich and University of Bologna.
+// Solderpad Hardware License, Version 0.51, see LICENSE for details.
+// SPDX-License-Identifier: SHL-0.51
+
+`ifndef __SNITCH_HWPE_SUBSYSTEM_RDL__
+`define __SNITCH_HWPE_SUBSYSTEM_RDL__
+
+addrmap snitch_hwpe_subsystem {
+  default regwidth = 32;
+
+  // Write-one-to-clear latch of per-core HWPE events.
+  reg {
+    field {
+      desc = "Write-one-to-clear event latch for core i.";
+      sw = w; hw = r;
+    } clr[31:0];
+  } evt_clr @0x94;
+
+  // Select which HWPE master is connected to the shared HCI/TCDM port.
+  // 0 = Neureka, 1 = Datamover.
+  reg {
+    field {
+      desc = "Select active HCI master: 0=Neureka, 1=Datamover.";
+      sw = rw; hw = rw;
+    } sel[0:0] = 0;
+  } mux_sel @0x98;
+
+  // Clock gating enable for sub-blocks inside the subsystem.
+  // bit 0: Neureka clk, bit 1: Datamover clk.
+  reg {
+    field {
+      desc = "Clock enable: bit0=Neureka, bit1=Datamover.";
+      sw = rw; hw = rw;
+    } en[1:0] = 0;
+    field { sw = r; hw = na; } rsvd[31:2] = 0;
+  } clk_en @0x9C;
+
+};
+
+`endif // __SNITCH_HWPE_SUBSYSTEM_RDL__

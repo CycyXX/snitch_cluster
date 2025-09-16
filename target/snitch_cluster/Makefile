@@ -10,9 +10,9 @@
 #######################
 
 # ON to turn on debugging symbols and wave logging
-DEBUG ?= OFF
+DEBUG ?= ON
 # Override default config file
-CFG_OVERRIDE ?=
+CFG_OVERRIDE ?= cfg/konark.json
 
 .PHONY: all clean
 all: rtl sw

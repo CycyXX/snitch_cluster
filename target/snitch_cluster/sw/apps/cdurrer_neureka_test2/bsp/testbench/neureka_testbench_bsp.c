@@ -20,10 +20,10 @@
  */
 
 #include "neureka_testbench_bsp.h"
+#include "konark_addrmap.h"
 #include <pmsis.h>
 
-// #define NEUREKA_TESTBENCH_CLUSTER_CTRL_BASE_ADDR (0x10040000)   // ToDo(cdurrer): not used anywhere?
-#define NEUREKA_TESTBENCH_BASE_ADDR (0x10040000)
+#define NEUREKA_TESTBENCH_BASE_ADDR (KONARK_HWPE_SUBSYS_BASE_ADDR)
 
 
 void neureka_testbench_hci_setpriority_neureka() {

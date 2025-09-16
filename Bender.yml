@@ -28,7 +28,7 @@ dependencies:
   riscv-dbg:          { git: https://github.com/pulp-platform/riscv-dbg,          version:  0.8.0       }
   cluster_icache:     { git: https://github.com/pulp-platform/cluster_icache.git, rev: 64e21ae455bbdde850c4df13bef86ea55ac42537 }
   idma:               { git: https://github.com/pulp-platform/iDMA.git,           rev: __deploy__bebefa3__master }
-  hci:                { git: https://github.com/pulp-platform/hci.git,            rev: "06fcba671e060f2e1b03b7ebe2d3e719f1557099" }
+  hci:                { git: https://github.com/pulp-platform/hci.git,            rev: "5421524afca701e45a83d0f1ec47568c019e021a" }
   neureka:            { git: https://github.com/pulp-platform/neureka.git,        rev: main             }
   datamover:          { git: https://github.com/pulp-platform/datamover.git,      rev: transpose        }
 

@@ -24,12 +24,16 @@ SNITCH_CLUSTER_ADDRMAP_H            = $(SNRT_HAL_HDRS_DIR)/snitch_cluster_addrma
 SNITCH_CLUSTER_RAW_ADDRMAP_H        = $(SNRT_HAL_HDRS_DIR)/snitch_cluster_raw_addrmap.h
 SNITCH_CLUSTER_PERIPHERAL_H         = $(SNRT_HAL_HDRS_DIR)/snitch_cluster_peripheral.h
 SNITCH_CLUSTER_PERIPHERAL_ADDRMAP_H = $(SNRT_HAL_HDRS_DIR)/snitch_cluster_peripheral_addrmap.h
+SNITCH_HWPE_SUBSYSTEM_ADDRMAP_H     = $(SNRT_HAL_HDRS_DIR)/snitch_hwpe_subsystem_addrmap.h
+KONARK_ADDRMAP_H                    = $(SNRT_HAL_HDRS_DIR)/konark_addrmap.h
 
 SNRT_HAL_HDRS += $(SNITCH_CLUSTER_CFG_H)
 SNRT_HAL_HDRS += $(SNITCH_CLUSTER_ADDRMAP_H)
 SNRT_HAL_HDRS += $(SNITCH_CLUSTER_RAW_ADDRMAP_H)
 SNRT_HAL_HDRS += $(SNITCH_CLUSTER_PERIPHERAL_H)
 SNRT_HAL_HDRS += $(SNITCH_CLUSTER_PERIPHERAL_ADDRMAP_H)
+SNRT_HAL_HDRS += $(SNITCH_HWPE_SUBSYSTEM_ADDRMAP_H)
+SNRT_HAL_HDRS += $(KONARK_ADDRMAP_H)
 
 SNITCH_CLUSTER_ADDRMAP_RDL = $(SNRT_HAL_HDRS_DIR)/snitch_cluster_addrmap.rdl
 
@@ -39,6 +43,7 @@ $(eval $(call sn_cluster_gen_rule,$(SNITCH_CLUSTER_ADDRMAP_RDL),$(SNITCH_CLUSTER
 
 # peakrdl headers
 SN_PEAKRDL_INCDIRS += -I $(SN_ROOT)/hw/snitch_cluster/src/snitch_cluster_peripheral
+SN_PEAKRDL_INCDIRS += -I $(SN_ROOT)/hw/snitch_cluster/src/hwpe_subsystem
 SN_PEAKRDL_INCDIRS += -I $(SN_GEN_DIR)
 $(eval $(call peakrdl_generate_header_rule,$(SNITCH_CLUSTER_PERIPHERAL_H),$(SN_ROOT)/hw/snitch_cluster/src/snitch_cluster_peripheral/snitch_cluster_peripheral_reg.rdl))
 $(eval $(call peakrdl_generate_header_rule,$(SNITCH_CLUSTER_ADDRMAP_H),$(SNITCH_CLUSTER_ADDRMAP_RDL),$(SN_PEAKRDL_INCDIRS)))
@@ -52,6 +57,17 @@ $(SNITCH_CLUSTER_RAW_ADDRMAP_H): $(SNITCH_CLUSTER_ADDRMAP_RDL) $(SN_CLUSTER_RDL)
 $(SNITCH_CLUSTER_PERIPHERAL_ADDRMAP_H): $(SN_ROOT)/hw/snitch_cluster/src/snitch_cluster_peripheral/snitch_cluster_peripheral_reg.rdl
 	@echo "[peakrdl] Generating $@"
 	$(PEAKRDL) raw-header $< -o $(SNITCH_CLUSTER_PERIPHERAL_ADDRMAP_H) --format c $(SN_PEAKRDL_INCDIRS)
+
+# HWPE Subsystem (Konark) raw C header from SystemRDL
+$(SNITCH_HWPE_SUBSYSTEM_ADDRMAP_H): $(SN_ROOT)/hw/snitch_cluster/src/hwpe_subsystem/snitch_hwpe_subsystem.rdl
+	@echo "[peakrdl] Generating $@"
+	$(PEAKRDL) raw-header $< -o $(SNITCH_HWPE_SUBSYSTEM_ADDRMAP_H) --format c $(SN_PEAKRDL_INCDIRS)
+
+# Konark top-level raw C header from SystemRDL
+
+$(KONARK_ADDRMAP_H): $(SN_ROOT)/hw/snitch_cluster/src/konark.rdl $(SN_GEN_DIR)/snitch_cluster.rdl $(SN_ROOT)/hw/snitch_cluster/src/hwpe_subsystem/snitch_hwpe_subsystem.rdl
+	@echo "[peakrdl] Generating $@"
+	$(PEAKRDL) raw-header $< -o $(KONARK_ADDRMAP_H) --format c $(SN_PEAKRDL_INCDIRS) -I $(SN_ROOT)/hw/snitch_cluster/src
 
 
 .PHONY: sn-clean-headers
@@ -101,7 +117,7 @@ SNRT_APPS += sw/apps/box3d1r
 SNRT_APPS += sw/apps/j3d27pt
 SNRT_APPS += sw/apps/cdurrer_test
 SNRT_APPS += sw/apps/cdurrer_neureka_test2
-SNRT_APPS += sw/apps/cdurrer_datamover_test
+SNRT_APPS += sw/apps/datamover
 
 
 # Include Makefile from each app subdirectory
