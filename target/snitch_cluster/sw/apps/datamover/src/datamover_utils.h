@@ -5,6 +5,8 @@
 // Francesco Conti <f.conti@unibo.it>
 //
 
+#include <inttypes.h>
+
 #pragma once
 
 #define ERR 0x0011
@@ -18,14 +20,15 @@ static inline int datamover_compare_int(
   for (int i=0; i<len; i++) {
     uint64_t actual_ = *(actual+i);
     uint64_t golden_ = *(golden+i);
+    // printf("  0x%" PRIx64 " <- 0x%" PRIx64 " @ %p (%d)\n", golden_, actual_, (void *)(actual+i), i);
+    // printf("  0x%016x <- 0x%016x @ 0x%08x (%d)\n", golden_, actual_, (actual+i), i);
     if (actual_ != golden_) {
+      // printf("ERROR! 0x%" PRIx64 " != 0x%" PRIx64 " @ %p (%d)\n", actual_, golden_, (void *)(actual+i), i);
       errors ++;
     }
-#ifdef VERBOSE
-    if(actual_ ^ golden_) {
-      printf("  0x%016x <- 0x%016x @ 0x%08x (%d)\n", golden_, actual_, (actual+i), i);
-    }
-#endif
+    #ifdef VERBOSE
+    printf("  0x%" PRIx64 " <- 0x%" PRIx64 " @ %p (%d)\n", golden_, actual_, (void *)(actual+i), i);
+    #endif
   }
   return errors;
 }

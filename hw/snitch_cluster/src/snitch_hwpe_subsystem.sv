@@ -15,7 +15,7 @@ module snitch_hwpe_subsystem
   parameter type         tcdm_rsp_t    = logic,
   parameter type         periph_req_t  = logic,
   parameter type         periph_rsp_t  = logic,
-  parameter int unsigned HwpeDataWidth = 288,
+  parameter int unsigned HwpeDataWidth = 512,   //288,
   parameter int unsigned IdWidth       = 2,
   parameter int unsigned NrCores       = 2,    // corresponds to Snitch cluster (ToDo(cdurrer): count DMA cores?)
   parameter int unsigned NrContext     = 2,
@@ -47,6 +47,16 @@ module snitch_hwpe_subsystem
   // verilog_format: off
   localparam hci_size_parameter_t HCISizeTcdm = '{
     DW:  HwpeDataWidth,
+    AW:  DEFAULT_AW,
+    BW:  DEFAULT_BW,
+    UW:  0, //DEFAULT_UW,
+    IW:  1, //DEFAULT_IW,
+    EW:  0,
+    EHW: 0
+  };
+
+  localparam hci_size_parameter_t HCISizeTcdm_neureka = '{
+    DW:  288,
     AW:  DEFAULT_AW,
     BW:  DEFAULT_BW,
     UW:  0, //DEFAULT_UW,
@@ -238,13 +248,13 @@ module snitch_hwpe_subsystem
     .TP_OUT       (TP_OUT),
     .CNT          (VLEN_CNT_SIZE),
     .ID           (IdWidth),
-    .BW           (HwpeDataWidth),
-    .DW           (HCISizeTcdm.DW),
+    .BW           (288),  //(HwpeDataWidth),    // MEM_BANDWIDTH_EXT
+    .DW           (288),  //(HCISizeTcdm.DW),             // STREAM_BANDWIDTH
     .N_CORES      (NrCores),
     .N_CONTEXT    (NrContext),
     .PE_H         (PE_H),
     .PE_W         (PE_W),
-    .HCI_SIZE_tcdm(HCISizeTcdm)
+    .HCI_SIZE_tcdm(HCISizeTcdm_neureka)
   ) i_neureka_top (
     .clk_i      (hwpe_clk[0]),
     .rst_ni     (rst_ni),
