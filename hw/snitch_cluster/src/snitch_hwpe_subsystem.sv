@@ -278,8 +278,12 @@ module snitch_hwpe_subsystem
 
   datamover_top #(
     .ID           (IdWidth),
+    .BANDWIDTH    (HwpeDataWidth),
+    .NUM_ELEM_WORD(TCDMDataWidth / 8),
+    .ELEM_WIDTH   (8),
     .N_CORES      (NrCores),
-    .BW           (HwpeDataWidth),
+    .N_CONTEXT    (NrContext),
+    .MISALIGNED_ACCESSES (0),
     .HCI_SIZE_tcdm(HCISizeTcdm)
   ) i_datamover_top (
     .clk_i      (hwpe_clk[1]),

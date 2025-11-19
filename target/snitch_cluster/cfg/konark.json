@@ -4,20 +4,20 @@
 
 {
     cluster: {
-        cluster_base_addr: 0x10000000,  // ToDo(cdurrer): use 0 instead?
+        cluster_base_addr: 0x10000000,
         cluster_base_offset: 0x0,
         cluster_base_hartid: 1,
         addr_width: 48,         // Length of the address, should be greater than 30. If the address is larger than 34 the data bus needs to be 64 bits in size [48]
         data_width: 64,
         atomic_id_width: 1,     // Width of the cluster's atomics ID [1]: max(1, clog2(total number of clusters))
-        user_width: 49,         // User width of the narrower AXI plug into the cluster: addr_width + atomic_id_width   ToDo(cdurrer)?
+        user_width: 49,         // User width of the narrower AXI plug into the cluster: addr_width + atomic_id_width
         tcdm: {
             size: 128,          // Size of TCDM in KiByte. Divided in `n` banks. The total size must be divisible by the number of banks [128]
             banks: 32,          // Number of banks [32]
         },
-        cluster_periph_size: 60,// kB   Address region size reserved for cluster peripherals in KiByte  ToDo(cdurrer)?
-        zero_mem_size: 64,      // kB   Address region size reserved for the Zero-Memory in KiByte      ToDo(cdurrer)?
-        ext_mem_size: 4,        // kB   Address region size reserved for an external slave in KiByte    ToDo(cdurrer)?
+        cluster_periph_size: 60,// kB   Address region size reserved for cluster peripherals in KiByte
+        zero_mem_size: 64,      // kB   Address region size reserved for the Zero-Memory in KiByte
+        ext_mem_size: 4,        // kB   Address region size reserved for an external slave in KiByte
         dma_data_width: 512,
         dma_axi_req_fifo_depth: 24,
         dma_req_fifo_depth: 8,
@@ -26,10 +26,8 @@
         dma_user_width: 48,     // User width of the wide AXI plug into the cluster
         enable_multicast: true,
         cluster_base_expose: true,      // Whether to expose base_addr and base_hart_id
-        alias_region_enable: true,      // Whether to provide a hardwired alias region for the TCDM (and cluster) address space - ToDo(cdurrer): is this necessary?
-        alias_region_base: 0x30000000,
-        wide_tcdm_port_expose: true,    // ToDo(cdurrer): removed from snitch cluster? Only use num_exposed_wide_tcdm_ports now?
-        num_exposed_wide_tcdm_ports: 1, // Number of exposed wide ports into the TCDM at the cluster interface. Used to provide external masters, such as accelerators, with wide access to the TCDM - ToDo(cdurrer): why not declared in Picobello cluster?
+        alias_region_enable: true,      // Whether to provide a hardwired alias region for the TCDM (and cluster) address space - necessary for bootrom mechanism
+        num_exposed_wide_tcdm_ports: 1, // Number of exposed wide ports into the TCDM at the cluster interface. Used to provide external masters, such as accelerators, with wide access to the TCDM
         narrow_axi_port_expose: true,   // Whether to expose a narrow AXI master port at the cluster interface. Used to provide a narrow interface to external slaves, e.g. to configure external accelerators
         enable_external_interrupts: true,
         // We don't need Snitch (core-internal) virtual memory support
@@ -68,9 +66,9 @@
             // Hive 0
             {
                 icache: {
-                    size: 8, // total instruction cache size in kByte [8]   ToDo(cdurrer): what is a reasonable size for 1 CC and accelerators?
-                    ways: 2, // number of ways [2]                          ToDo(cdurrer): what is this?
-                    cacheline: 256 // word size in bits [128]               ToDo(cdurrer): use default (128) instead?
+                    size: 8, // total instruction cache size in kByte [8]
+                    ways: 2, // number of ways [2]
+                    cacheline: 256 // word size in bits [128]               ToDo(cdurrer): use default (128) instead? Or possibly 512 (match wide port)?
                 },
                 cores: [
                     { $ref: "#/compute_core_template" },
