@@ -55,10 +55,12 @@
 #define DATAMOVER_REG_TRANSP_MODE   0x28       // Transposition mode (LSB: 000=none, 001=8b, 010=16b, 100=32b) + Leftover (MSB 31:16)
 
 // Transposition formats
-#define DATAMOVER_TRANSP_NONE       0x0
-#define DATAMOVER_TRANSP_1ELEM      0x1
-#define DATAMOVER_TRANSP_2ELEM      0x2
-#define DATAMOVER_TRANSP_4ELEM      0x4
+typedef enum {
+    DATAMOVER_TRANSP_NONE  = 0x0,
+    DATAMOVER_TRANSP_1ELEM = 0x1,
+    DATAMOVER_TRANSP_2ELEM = 0x2,
+    DATAMOVER_TRANSP_4ELEM = 0x4
+} datamover_transp_mode_t;
 
 // FP Formats encoding      ToDo(cdurrer): verify?
 #define DATAMOVER_FP16              0x2

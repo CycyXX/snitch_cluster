@@ -8,6 +8,7 @@
 #pragma once
 
 #include "archi_datamover.h"
+// #include "snitch_cluster_addrmap.h"   // ToDo(cdurrer): remove dependency to address map by passing it to init function
 
 #define DATAMOVER_ADDR_BASE DATAMOVER_BASE_ADD
 
@@ -19,68 +20,28 @@ typedef enum {
     DM_ERR
 } datamover_status_t;
 
-static inline void datamover_in_set(unsigned int value) {
-  DATAMOVER_WRITE(value, DATAMOVER_REG_OFFS + DATAMOVER_REG_IN_PTR);
-}
+// Function declarations
+void datamover_in_set(unsigned int value);
+void datamover_out_set(unsigned int value);
+void datamover_len0_set(unsigned int value);
+void datamover_len1_set(unsigned int value);
+void datamover_in_d0_stride_set(unsigned int value);
+void datamover_in_d1_stride_set(unsigned int value);
+void datamover_in_d2_stride_set(unsigned int value);
+void datamover_out_d0_stride_set(unsigned int value);
+void datamover_out_d1_stride_set(unsigned int value);
+void datamover_out_d2_stride_set(unsigned int value);
+void datamover_transp_mode_set(unsigned int value);
+void datamover_trigger_job();
+int datamover_acquire_job();
+unsigned int datamover_get_status();
+unsigned int datamover_get_running_job();
+void datamover_soft_clear();
+void datamover_evt_clear(int value);
+void datamover_cg_enable();
+void datamover_cg_disable();
+void datamover_mux_enable();
 
-static inline void datamover_out_set(unsigned int value) {
-  DATAMOVER_WRITE(value, DATAMOVER_REG_OFFS + DATAMOVER_REG_OUT_PTR);
-}
-
-static inline void datamover_len0_set(unsigned int value) {
-  DATAMOVER_WRITE(value, DATAMOVER_REG_OFFS + DATAMOVER_REG_LEN0);
-}
-
-static inline void datamover_len1_set(unsigned int value) {
-  DATAMOVER_WRITE(value, DATAMOVER_REG_OFFS + DATAMOVER_REG_LEN1);
-}
-
-static inline void datamover_in_d0_stride_set(unsigned int value) {
-  DATAMOVER_WRITE(value, DATAMOVER_REG_OFFS + DATAMOVER_REG_IN_D0_STRIDE);
-}
-
-static inline void datamover_in_d1_stride_set(unsigned int value) {
-  DATAMOVER_WRITE(value, DATAMOVER_REG_OFFS + DATAMOVER_REG_IN_D1_STRIDE);
-}
-
-static inline void datamover_in_d2_stride_set(unsigned int value) {
-  DATAMOVER_WRITE(value, DATAMOVER_REG_OFFS + DATAMOVER_REG_IN_D2_STRIDE);
-}
-
-static inline void datamover_out_d0_stride_set(unsigned int value) {
-  DATAMOVER_WRITE(value, DATAMOVER_REG_OFFS + DATAMOVER_REG_OUT_D0_STRIDE);
-}
-
-static inline void datamover_out_d1_stride_set(unsigned int value) {
-  DATAMOVER_WRITE(value, DATAMOVER_REG_OFFS + DATAMOVER_REG_OUT_D1_STRIDE);
-}
-
-static inline void datamover_out_d2_stride_set(unsigned int value) {
-  DATAMOVER_WRITE(value, DATAMOVER_REG_OFFS + DATAMOVER_REG_OUT_D2_STRIDE);
-}
-
-static inline void datamover_transp_mode_set(unsigned int value) {
-  DATAMOVER_WRITE(value, DATAMOVER_REG_OFFS + DATAMOVER_REG_TRANSP_MODE);
-}
-
-static inline void datamover_trigger_job() { DATAMOVER_WRITE(0, DATAMOVER_TRIGGER); }
-
-static inline int datamover_acquire_job() { return DATAMOVER_READ(DATAMOVER_ACQUIRE); }
-
-static inline unsigned int datamover_get_status() { return DATAMOVER_READ(DATAMOVER_STATUS); }
-static inline unsigned int datamover_get_running_job() { return DATAMOVER_READ(DATAMOVER_RUNNING_JOB); }
-
-static inline void datamover_soft_clear() {
-  volatile int i;
-  DATAMOVER_WRITE(0, DATAMOVER_SOFT_CLEAR);
-}
-
-static inline void datamover_evt_clear(int value) {
-  DATAMOVER_WRITE(value, DATAMOVER_EVT_OFFS);
-}
-
-static inline void datamover_cg_enable() { DATAMOVER_WRITE(2, DATAMOVER_CK_GATE_OFFS); }
-
-static inline void datamover_cg_disable() { DATAMOVER_WRITE(0, DATAMOVER_CK_GATE_OFFS); }
-
-static inline void datamover_mux_enable() { DATAMOVER_WRITE(1, DATAMOVER_MUX_SEL_OFFS); }
+void datamover_init();    // ToDo(cdurrer): pass cluster address map?
+datamover_status_t datamover_copy(uint8_t *src, uint8_t *dst, uint32_t nof_elements);
+datamover_status_t datamover_transpose(uint8_t *matrix_in, uint8_t *matrix_out, uint32_t size_m, uint32_t size_n, datamover_transp_mode_t transp_mode);

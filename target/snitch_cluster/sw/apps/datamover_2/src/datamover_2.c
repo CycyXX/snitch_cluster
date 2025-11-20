@@ -5,81 +5,15 @@
 // Authors: Cyrill Durrer <cdurrer@iis.ee.ethz.ch>
 //          Daniel Keller <dankeller@student.ethz.ch>
 
+#include "hal_datamover.h"
+#include "datamover_utils.h"
+#include "snitch_cluster_addrmap.h"
+#include "snrt.h"
+#include "data.h"
 
 #include <stdint.h>
 #include <stdio.h>
 
-#include "snrt.h"
-#include "snitch_cluster_addrmap.h"
-#include "hal_datamover.h"
-#include "datamover_utils.h"
-#include "data.h"
-
-static inline uint32_t tcdm_offset(void *ptr) {
-  return (uint32_t)((uintptr_t)ptr - (uintptr_t)&snitch_cluster_addrmap.cluster);
-}
-
-void datamover_init() {
-  datamover_cg_enable();
-  datamover_mux_enable();
-  datamover_soft_clear();
-}
-
-datamover_status_t datamover_copy(uint8_t *src, uint8_t *dst, uint32_t nof_elements) {
-  uint32_t src_off = tcdm_offset(src);
-  uint32_t dst_off = tcdm_offset(dst);
-  int acq_to = 1000000;
-  int job_id = -1;
-
-  while ((job_id = datamover_acquire_job()) < 0 && --acq_to) {}
-  if (acq_to == 0) {
-    printf("[DM-ERR] acquire timeout (job0)\n");
-    return DM_ERR;
-  }
-
-  datamover_in_set(src_off);
-  datamover_out_set(dst_off);
-  datamover_len0_set((((nof_elements/DATAMOVER_BANDWIDTH_ELEMS) & 0xFFF) << 12) | (nof_elements & 0xFFF)); // tot_len
-  datamover_len1_set((nof_elements/DATAMOVER_BANDWIDTH_ELEMS) & 0xFFF); // out_d0_len
-  datamover_in_d0_stride_set(DATAMOVER_BANDWIDTH_ELEMS);
-  datamover_out_d0_stride_set(DATAMOVER_BANDWIDTH_ELEMS);
-  datamover_in_d1_stride_set(0);
-  datamover_out_d1_stride_set(0);
-  datamover_in_d2_stride_set(0);
-  datamover_out_d2_stride_set(0);
-  datamover_transp_mode_set(DATAMOVER_TRANSP_NONE);
-  datamover_trigger_job();
-  printf("[DM-CFG] Copying %i elements (src=0x%08x, dst=0x%08x)\n", nof_elements, src_off, dst_off);
-  return DM_OK;
-}
-
-datamover_status_t datamover_transpose(uint8_t *matrix_in, uint8_t *matrix_out, uint32_t size_m, uint32_t size_n, uint8_t transp_mode) {
-  uint32_t src_off = tcdm_offset(matrix_in);
-  uint32_t dst_off = tcdm_offset(matrix_out);
-  int acq_to = 1000000;
-  int job_id = -1;
-
-  while ((job_id = datamover_acquire_job()) < 0 && --acq_to) {}
-  if (acq_to == 0) {
-    printf("[DM-ERR] acquire timeout (job1)\n");
-    return DM_ERR;
-  }
-
-  datamover_in_set(src_off);
-  datamover_out_set(dst_off);
-  datamover_len0_set((((size_n/DATAMOVER_BANDWIDTH_ELEMS) & 0x0FF) << 24) | ((size_m & 0xFFF) << 12) | (((size_m * size_n) / DATAMOVER_BANDWIDTH_ELEMS) & 0xFFF)); // in_d1_len[7:0] | in_d0_len | tot_len
-  datamover_len1_set((((size_n/DATAMOVER_BANDWIDTH_ELEMS) & 0xF00) << (24-8)) | ((((size_m*transp_mode)/DATAMOVER_BANDWIDTH_ELEMS) & 0xFFF) << 12) | (DATAMOVER_BANDWIDTH_ELEMS & 0xFFF)); // in_d1_len[11:8] | out_d1_len | out_d0_len
-  datamover_in_d0_stride_set(size_n);
-  datamover_out_d0_stride_set(size_m * transp_mode);
-  datamover_in_d1_stride_set(DATAMOVER_BANDWIDTH_ELEMS);
-  datamover_out_d1_stride_set(DATAMOVER_BANDWIDTH_ELEMS);
-  datamover_in_d2_stride_set(0);
-  datamover_out_d2_stride_set(size_m * DATAMOVER_BANDWIDTH_ELEMS);
-  datamover_transp_mode_set(transp_mode);
-  datamover_trigger_job();
-  printf("[DM-CFG] Transposing matrix: %ix%i, mode: %i elements (src=0x%08x, dst=0x%08x)\n", size_m, size_n, transp_mode, src_off, dst_off);
-  return DM_OK;
-}
 
 int main() {
   if (snrt_cluster_idx() > 0) return 0;
@@ -118,7 +52,6 @@ int main() {
     snrt_dma_start_1d(local_gold3, golden_out3, tot_size/4);
     snrt_dma_wait_all();
   }
-
   snrt_cluster_hw_barrier();
 
   if (snrt_cluster_core_idx() == 0) {
