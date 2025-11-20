@@ -29,8 +29,9 @@ dependencies:
   cluster_icache:     { git: https://github.com/pulp-platform/cluster_icache.git, rev: 64e21ae455bbdde850c4df13bef86ea55ac42537 }
   idma:               { git: https://github.com/pulp-platform/iDMA.git,           rev: __deploy__bebefa3__master }
   hci:                { git: https://github.com/pulp-platform/hci.git,            rev: 9844a893c34612ac66697e8dcd60214296f2634c }
+  datamover:          { git: https://github.com/pulp-platform/datamover.git,      rev: 0c251ee6e65877553ade43a425c800801f09fc25 } #cdurrer/konark
   neureka:            { git: https://github.com/pulp-platform/neureka.git,        rev: main             }
-  datamover:          { git: https://github.com/pulp-platform/datamover.git,      rev: 2497da931c10cc96c999dfa520a27ed568d77079 } #cdurrer/konark
+  # cim:                { git: git@iis-git.ee.ethz.ch:visual-wakeup/cim.git,    rev: 4ac5d330e758d2c1d3c72f2d7ca483097caedfc1 } #lkesting/devel
 
 export_include_dirs:
   - hw/reqrsp_interface/include
@@ -191,22 +192,7 @@ sources:
       - target/common/test/tb_bin.sv
       - target/common/test/tb_bin_konark.sv
 
-  # target/snitch_cluster
-  # - target: snitch_cluster_wrapper
-  #   files:
-  #     - target/snitch_cluster/generated/snitch_cluster_pkg.sv
-  # - target: all(snitch_cluster_wrapper, not(postlayout))
-  #   files:
-  #     - target/snitch_cluster/generated/snitch_cluster_wrapper.sv
-  # - target: all(snitch_cluster_wrapper, postlayout)
-  #   files:
-  #     - nonfree/gf12/fusion/runs/0/out/15/snitch_cluster_wrapper.v
-  # - target: all(snitch_cluster_wrapper, any(simulation, verilator))
-  #   files:
-  #     - target/snitch_cluster/test/vip_snitch_cluster.sv
-  #     - target/snitch_cluster/test/testharness.sv
-
-  # cdurrer: Konark
+  # Konark cluster
   - target: konark
     files:
       - target/snitch_cluster/generated/snitch_cluster_pkg.sv

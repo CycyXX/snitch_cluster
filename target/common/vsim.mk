@@ -53,7 +53,7 @@ endif
 ifeq ($(VCD_DUMP), 1)
 VSIM_FLAGS += -do "source $(ROOT)/nonfree/gf12/modelsim/vcd.tcl"
 else
-VSIM_FLAGS += -do "wave.do" -do "run -a"
+VSIM_FLAGS += -do "run -a"
 endif
 
 # Misc
