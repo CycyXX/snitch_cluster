@@ -118,6 +118,7 @@ SNRT_APPS += sw/apps/j3d27pt
 SNRT_APPS += sw/apps/cdurrer_test
 SNRT_APPS += sw/apps/cdurrer_neureka_test2
 SNRT_APPS += sw/apps/datamover
+SNRT_APPS += sw/apps/datamover_2
 
 
 # Include Makefile from each app subdirectory

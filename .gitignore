@@ -16,6 +16,7 @@ transcript
 .vscode/
 __pycache__
 gmon.out
+working_dir/
 
 # Docs
 /site/
