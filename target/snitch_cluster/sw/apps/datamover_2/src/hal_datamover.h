@@ -2,8 +2,8 @@
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
 //
-// Francesco Conti <f.conti@unibo.it>
-//
+// Authors: Francesco Conti <f.conti@unibo.it>
+//          Cyrill Durrer <cdurrer@iis.ee.ethz.ch>
 
 #pragma once
 
@@ -13,6 +13,11 @@
 
 #define DATAMOVER_WRITE(value, offset) *(volatile int *)(DATAMOVER_ADDR_BASE + offset) = value
 #define DATAMOVER_READ(offset) *(volatile int *)(DATAMOVER_ADDR_BASE + offset)
+
+typedef enum {
+    DM_OK = 0,
+    DM_ERR
+} datamover_status_t;
 
 static inline void datamover_in_set(unsigned int value) {
   DATAMOVER_WRITE(value, DATAMOVER_REG_OFFS + DATAMOVER_REG_IN_PTR);
